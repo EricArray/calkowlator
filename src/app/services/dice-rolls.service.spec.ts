@@ -133,7 +133,7 @@ describe('DiceRollsService', () => {
         [0, fraction(1, 2)],
         [1, fraction(1, 2)],
       ])
-      expect(service.combineTables(tableA, tableB)).toEqual(new Map([
+      expect(service.combineTwoTables(tableA, tableB)).toEqual(new Map([
         [0, fraction(1, 4)],
         [1, fraction(2, 4)],
         [2, fraction(1, 4)],
@@ -148,7 +148,7 @@ describe('DiceRollsService', () => {
         [0, fraction(3, 4)],
         [1, fraction(1, 4)],
       ])
-      expect(service.combineTables(tableA, tableB)).toEqual(new Map([
+      expect(service.combineTwoTables(tableA, tableB)).toEqual(new Map([
         [0, fraction(9, 16)],
         [1, fraction(6, 16)],
         [2, fraction(1, 16)],
@@ -163,7 +163,7 @@ describe('DiceRollsService', () => {
         [0, fraction(3, 4)],
         [1, fraction(1, 4)],
       ])
-      expect(service.combineTables(tableA, tableB)).toEqual(new Map([
+      expect(service.combineTwoTables(tableA, tableB)).toEqual(new Map([
         [0, fraction(3, 8)],
         [1, fraction(4, 8)],
         [2, fraction(1, 8)],

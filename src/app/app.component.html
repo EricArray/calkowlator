@@ -1,60 +1,57 @@
 <h1>Cal<b>KoW</b>lator</h1>
+
 <div>
-    <h2>Attacker 1</h2>
-    <label>
-        Attack: 
-        <input type="number" min="0" max="100" [(ngModel)]="attack">
-    </label>
-    <label>
-        Melee: 
-        <input type="number" min="2" max="6" [(ngModel)]="melee">
-    </label>
-    <label>
-        Elite:
-        <input type="checkbox" [(ngModel)]="elite">
-    </label>
+    <h2>Charge 1</h2>
+    <style>
+        .inputs-table input {
+            width: 40px;
+        }
+    </style>
+    <table class="inputs-table">
+        <tr style="border-bottom: 1px solid black">
+            <th>Attacker</th>
+            <th>Active</th>
+            <th>Me</th>
+            <th>Att</th>
+            <th>CS</th>
+            <th>TC</th>
+            <th>Elite</th>
+            <th>Vicious</th>
+        </tr>
+
+        <tr *ngFor="let attacker of attackers; let index = index">
+            <td>Attacker {{ index + 1 }}</td>
+            <td><input type="checkbox" [(ngModel)]="attacker.active"></td>
+            <td><input type="number" min="2" max="6" [(ngModel)]="attacker.melee"></td>
+            <td><input type="number" min="0" max="100" [(ngModel)]="attacker.attack"></td>
+            <td><input type="number" min="0" max="6"></td>
+            <td><input type="number" min="0" max="6"></td>
+            <td><input type="checkbox" [(ngModel)]="attacker.elite"></td>
+            <td><input type="checkbox" [(ngModel)]="attacker.vicious"></td>
+            <td><button (click)="removeAttacker(index)">Remove</button></td>
+        </tr>
+
+        <tr>
+            <button (click)="addAttacker()">Add attacker</button>
+        </tr>
+    </table>
     <label>
         Defense: 
         <input type="number" min="2" max="6" [(ngModel)]="defense">
     </label>
-    <label>
-        Vicious:
-        <input type="checkbox" [(ngModel)]="vicious">
-    </label>
 </div>
-<div>
-    <h2>Attacker 2</h2>
-    <label>
-        Attack: 
-        <input type="number" min="0" max="100" [(ngModel)]="attack2">
-    </label>
-    <label>
-        Melee: 
-        <input type="number" min="2" max="6" [(ngModel)]="melee2">
-    </label>
-    <label>
-        Elite:
-        <input type="checkbox" [(ngModel)]="elite2">
-    </label>
-    <label>
-        Defense: 
-        <input type="number" min="2" max="6" [(ngModel)]="defense2">
-    </label>
-    <label>
-        Vicious:
-        <input type="checkbox" [(ngModel)]="vicious2">
-    </label>
-</div>
+
 <button (click)="calculate()">Calculate</button>
 
-<div *ngIf="!error && result">
+<div *ngIf="!error && result" class="results">
+    <style>
+        .results td {
+            border: 1px solid lightgray
+        }
+    </style>
+
     <h2>Result</h2>
     <table>
-        <style>
-            td {
-                border: 1px solid lightgray
-            }
-        </style>
         <tr *ngFor="let entry of result">
             <td>{{entry.hits}}</td>
             <td>{{entry.fraction}}</td>
@@ -65,11 +62,6 @@
     
     <h2>Difference</h2>
     <table>
-        <style>
-            td {
-                border: 1px solid lightgray
-            }
-        </style>
         <tr *ngFor="let entry of difference">
             <td>{{entry.hits}}</td>
             <td>{{entry.fraction}}</td>

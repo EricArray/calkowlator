@@ -145,8 +145,18 @@ export class DiceRollsService {
 
     return woundsTable
   }
+  
+  combineTables(tables: Map<number, MathType>[]): Map<number, MathType> {
+    if (tables.length === 0) {
+      return new Map()
+    } else if (tables.length === 1) {
+      return tables[0]
+    } else {
+      return this.combineTwoTables(tables[0], this.combineTables(tables.slice(1)))
+    }
+  }
 
-  combineTables(tableA: Map<number, MathType>, tableB: Map<number, MathType>): Map<number, MathType> {
+  combineTwoTables(tableA: Map<number, MathType>, tableB: Map<number, MathType>): Map<number, MathType> {
     const combinedTable = new Map<number, MathType>()
 
     for (const entryA of tableA) {

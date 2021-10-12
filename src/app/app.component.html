@@ -1,0 +1,80 @@
+<h1>Cal<b>KoW</b>lator</h1>
+<div>
+    <h2>Attacker 1</h2>
+    <label>
+        Attack: 
+        <input type="number" min="0" max="100" [(ngModel)]="attack">
+    </label>
+    <label>
+        Melee: 
+        <input type="number" min="2" max="6" [(ngModel)]="melee">
+    </label>
+    <label>
+        Elite:
+        <input type="checkbox" [(ngModel)]="elite">
+    </label>
+    <label>
+        Defense: 
+        <input type="number" min="2" max="6" [(ngModel)]="defense">
+    </label>
+    <label>
+        Vicious:
+        <input type="checkbox" [(ngModel)]="vicious">
+    </label>
+</div>
+<div>
+    <h2>Attacker 2</h2>
+    <label>
+        Attack: 
+        <input type="number" min="0" max="100" [(ngModel)]="attack2">
+    </label>
+    <label>
+        Melee: 
+        <input type="number" min="2" max="6" [(ngModel)]="melee2">
+    </label>
+    <label>
+        Elite:
+        <input type="checkbox" [(ngModel)]="elite2">
+    </label>
+    <label>
+        Defense: 
+        <input type="number" min="2" max="6" [(ngModel)]="defense2">
+    </label>
+    <label>
+        Vicious:
+        <input type="checkbox" [(ngModel)]="vicious2">
+    </label>
+</div>
+<button (click)="calculate()">Calculate</button>
+
+<div *ngIf="!error && result">
+    <h2>Result</h2>
+    <table>
+        <style>
+            td {
+                border: 1px solid lightgray
+            }
+        </style>
+        <tr *ngFor="let entry of result">
+            <td>{{entry.hits}}</td>
+            <td>{{entry.fraction}}</td>
+            <td>{{entry.percent}}</td>
+        </tr>
+    </table>
+    <span>Average: {{ this.average }} {{ this.averageFraction }} </span>
+    
+    <h2>Difference</h2>
+    <table>
+        <style>
+            td {
+                border: 1px solid lightgray
+            }
+        </style>
+        <tr *ngFor="let entry of difference">
+            <td>{{entry.hits}}</td>
+            <td>{{entry.fraction}}</td>
+            <td>{{entry.percent}}</td>
+        </tr>
+    </table>
+</div>
+<h1 *ngIf="error">There was an error!</h1>

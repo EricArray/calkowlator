@@ -1,68 +1,13 @@
 <h1>Cal<b>KoW</b>lator</h1>
 
-<div *ngFor="let charge of charges; let index = index">
-    <h2>Charge #{{ index + 1}}</h2>
-    <div style="display: flex; flex-direction: row;">
-        <style>
-            .inputs-table {
-                border: 1px solid black;
-            }
-            .inputs-table input[type="number"] {
-                width: 40px;
-            }
-        </style>
-        <span>
-            <table class="inputs-table">
-                <tr style="border-bottom: 1px solid black">
-                    <th>Attacker</th>
-                    <th>Active</th>
-                    <th>Me</th>
-                    <th>Att</th>
-                    <th>CS</th>
-                    <th>TC</th>
-                    <th>Elite</th>
-                    <th>Vicious</th>
-                    <th>Facing</th>
-                </tr>
+<div>
+    <h2>Charge #1</h2>
+    <app-charge-input #charge1></app-charge-input>
+</div>
 
-                <tr *ngFor="let attacker of charge.attackers; let index = index">
-                    <td><input type="text" placeholder="Attacker #{{ index + 1 }}"></td>
-                    <td><input type="checkbox" [(ngModel)]="attacker.active"></td>
-                    <td><input type="number" min="2" max="6" [(ngModel)]="attacker.melee"></td>
-                    <td><input type="number" min="0" max="100" [(ngModel)]="attacker.attack"></td>
-                    <td><input type="number" min="0" max="6" [(ngModel)]="attacker.cs"></td>
-                    <td><input type="number" min="0" max="6" [(ngModel)]="attacker.tc"></td>
-                    <td><input type="checkbox" [(ngModel)]="attacker.elite"></td>
-                    <td><input type="checkbox" [(ngModel)]="attacker.vicious"></td>
-                    <td>
-                        <select [(ngModel)]="attacker.facing">
-                            <option [ngValue]="'front'">Front</option>
-                            <option [ngValue]="'flank'">Flank</option>
-                            <option [ngValue]="'rear'">Rear</option>
-                        </select>
-                    </td>
-                    <td><button (click)="removeAttacker(charge, index)">Remove</button></td>
-                </tr>
-
-                <tr>
-                    <button (click)="addAttacker(charge)">Add attacker</button>
-                </tr>
-            </table>
-        </span>
-
-        <span>
-            <table class="inputs-table">
-                <tr>
-                    <th>Defender</th>
-                    <th>Defense</th>
-                </tr>
-                <tr>
-                    <td><input type="text" placeholder="Defender"></td>
-                    <td><input type="number" min="2" max="6" [(ngModel)]="charge.defender.defense"></td>
-                </tr>
-            </table>
-        </span>
-    </div>
+<div>
+    <h2>Charge #2</h2>
+    <app-charge-input #charge2></app-charge-input>
 </div>
 
 <button (click)="calculate()">Calculate</button>

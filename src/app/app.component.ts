@@ -1,58 +1,16 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { format, Fraction, map, MathType, max, multiply, number, sum } from 'mathjs';
+import { Charge, ChargeInputComponent } from './charge-input/charge-input/charge-input.component';
 import { DiceRollsService, Melee, rerollAllOnes } from './services/dice-rolls.service';
 
-interface Attacker {
-  active: boolean;
-  melee: Melee;
-  attack: number;
-  cs?: number,
-  tc?: number,
-  elite: boolean;
-  vicious: boolean;
-  facing: 'front' | 'flank' | 'rear'
-}
-
-function defaultAttacker(): Attacker {
-  return {
-    active: true,
-    melee: 4,
-    attack: 2,
-    elite: false,
-    vicious: false,
-    facing: 'front',
-  }
-}
-
-interface Defender {
-  defense: 2 | 3 | 4 | 5 | 6;
-}
-
-interface Charge {
-  attackers: Attacker[];
-  defender: Defender;
-}
- 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  charges: Charge[] = [
-    {
-      attackers: [ defaultAttacker() ],
-      defender: {
-        defense: 4,
-      },
-    },
-    {
-      attackers: [ defaultAttacker() ],
-      defender: {
-        defense: 4,
-      },
-    },
-  ]
+  @ViewChild('charge1') charge1Component?: ChargeInputComponent
+  @ViewChild('charge2') charge2Component?: ChargeInputComponent
 
   results: {
     average: number;
@@ -62,18 +20,18 @@ export class AppComponent {
   difference: { hits: number, fraction: string, percent: string }[] | null = null
   error = false
 
+  get charges(): Charge[] {
+    return (
+      this.charge1Component && this.charge2Component
+        ? [
+          this.charge1Component?.charge,
+          this.charge2Component?.charge,
+        ]
+        : []
+    )
+  }
+
   constructor(private diceRollsService: DiceRollsService) {}
-
-  addAttacker(charge: Charge): void {
-    charge.attackers = [
-      ...charge.attackers,
-      defaultAttacker()
-    ]
-  }
-
-  removeAttacker(charge: Charge, removeIndex: number): void {
-    charge.attackers = charge.attackers.filter((attacker, index) => index !== removeIndex)
-  }
 
   calculate(): void {
     this.error = false

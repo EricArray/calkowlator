@@ -1,0 +1,12 @@
+:host {
+    display: flex;
+    flex-direction: row;
+}
+
+.inputs-table {
+    border: 1px solid black;
+}
+
+.inputs-table input[type="number"] {
+    width: 40px;
+}

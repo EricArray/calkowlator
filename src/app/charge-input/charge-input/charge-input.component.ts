@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Melee } from 'src/app/services/dice-rolls.service';
 
 interface Attacker {
+  name?: string;
   active: boolean;
   melee: Melee;
   attack: number;
@@ -9,7 +10,10 @@ interface Attacker {
   tc?: number,
   elite: boolean;
   vicious: boolean;
-  facing: 'front' | 'flank' | 'rear'
+  reroll1hit?: boolean;
+  blastDice?: 3 | 6;
+  blastPlus?: number;
+  facing: 'front' | 'flank' | 'rear';
 }
 
 function defaultAttacker(): Attacker {
@@ -52,6 +56,11 @@ export class ChargeInputComponent  {
       ...this.charge.attackers,
       defaultAttacker()
     ]
+  }
+
+  duplicateAttacker(duplicateIndex: number): void {
+    const newAttacker = { ...this.charge.attackers[duplicateIndex] }
+    this.charge.attackers.splice(duplicateIndex + 1, 0, newAttacker)
   }
 
   removeAttacker(removeIndex: number): void {

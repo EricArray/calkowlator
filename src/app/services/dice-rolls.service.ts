@@ -4,10 +4,18 @@ import { fromTo, fromZeroTo } from '../util';
 
 export type Melee = 2 | 3 | 4 | 5 | 6;
 
+export function diceProbability(required: 1 | 2 | 3 | 4 | 5 | 6): MathType {
+  return fraction(7 - required, 6)
+}
+
 export interface HitsParams {
   attack: number;
   melee: Melee;
   rerollFunctions?: RerollFunction[];
+  blast?: {
+    dice: 3 | 6;
+    plus?: number;
+  }
 }
 
 // reroll types:
@@ -60,44 +68,75 @@ export class DiceRollsService {
   }
 
   hitsTable(params: HitsParams): Map<number, MathType> {
-    let table = this.tableOfProbilitiesToGetSuccesses(params.attack, fraction(7 - params.melee, 6))
+    let table = this.tableOfProbilitiesToGetSuccesses(params.attack, diceProbability(params.melee))
     if (params.rerollFunctions && params.rerollFunctions.length > 0) {
       table = this.applyRerollFunctions(table, params.attack, params.melee, params.rerollFunctions)
+    }
+    if (params.blast) {
+      table = this.applyBlast(table, params.attack, params.blast)
     }
     return table
   }
   
-  applyRerollFunctions(table: Map<number, MathType>, attack: number, melee: Melee, rerollFunctions: RerollFunction[]): Map<number, MathType> {
-    const successChanceTableWithRerolls = []
-    for (const wantedHits of fromZeroTo(attack)) {
-      let chance = fraction(0) as MathType
-      for (const normalHits of fromZeroTo(wantedHits)) {
-        const requiredRerollHits = wantedHits - normalHits
-        const missedDice = attack - normalHits
-        chance = add(
-          chance, 
-          multiply(
-            table.get(normalHits) ?? fraction(0),
-            this.getChanceOfExactRerollHits(melee, requiredRerollHits, missedDice, rerollFunctions)
+  applyRerollFunctions(tableBeforeRerolls: Map<number, MathType>, attack: number, melee: Melee, rerollFunctions: RerollFunction[]): Map<number, MathType> {
+    const newTable = new Map<number, MathType>()
+
+    const probabilityOfGettingOneOnFailedDice = fraction(1, (melee - 1))
+
+    for (const [hitsBeforeRerolls, probabilityBeforeRerolls] of tableBeforeRerolls) {
+      const missedBeforeRerolls = attack - hitsBeforeRerolls
+      
+      for (const ones of fromTo(0, missedBeforeRerolls)) {
+        // a 'success' here would be to get a 1 (on a dice that already missed)
+        const probabilityToGetThisAmountOfOnes = this.probabilityToGetSuccesses(missedBeforeRerolls, probabilityOfGettingOneOnFailedDice, ones)
+
+        const whatWillBeRerolled = this.whatWillBeRerolled(ones, missedBeforeRerolls - ones, rerollFunctions)
+
+        for (const whatWillBeRerolledItem of whatWillBeRerolled) {
+          const rerollsTable = this.tableOfProbilitiesToGetSuccesses(
+            whatWillBeRerolledItem.willRerollOnes + whatWillBeRerolledItem.willRerollNotOnes,
+            diceProbability(melee)
           )
-        )
+          for (const [rerollHits, rerollHitsProbability] of rerollsTable) {
+            const newTotalHits = hitsBeforeRerolls + rerollHits
+            const newTotalProbability =
+              multiply(
+                probabilityBeforeRerolls,
+                multiply(
+                  rerollHitsProbability,
+                  multiply(
+                    whatWillBeRerolledItem.probability,
+                    probabilityToGetThisAmountOfOnes
+                  )
+                )
+              )
+            newTable.set(
+              newTotalHits,
+              add(newTotalProbability, newTable.get(newTotalHits) ?? fraction(0)),
+            )
+          }
+        }
       }
-      successChanceTableWithRerolls[wantedHits] = chance
     }
-    return new Map(successChanceTableWithRerolls.entries())
+
+    return newTable
   }
   
   getChanceOfExactRerollHits(melee: Melee, rerollHits: number, missedDice: number,  rerollFunctions: RerollFunction[]): MathType {
+    console.log('getChanceOfExactRerollHits', { melee, rerollHits, missedDice })
     const probabilityOfGettingOneOnFailedDice = fraction(1, (melee - 1))
     let chance = fraction(0) as any
     for (const ones of fromTo(rerollHits, missedDice)) {
       const probabilityToGetThisAmountOfOnes = this.probabilityToGetSuccesses(missedDice, probabilityOfGettingOneOnFailedDice, ones)
       const whatWillBeRerolled = this.whatWillBeRerolled(ones, missedDice - ones, rerollFunctions)
+      console.log({ ones, whatWillBeRerolled })
       for (const whatWillBeRerolledItem of whatWillBeRerolled) {
-        const subChance = this.probabilityToGetSuccesses(whatWillBeRerolledItem.willRerollOnes + whatWillBeRerolledItem.willRerollNotOnes, fraction(7 - melee, 6), rerollHits)
+        const totalRerolled = whatWillBeRerolledItem.willRerollOnes + whatWillBeRerolledItem.willRerollNotOnes
+        const subChance = this.probabilityToGetSuccesses(totalRerolled, diceProbability(melee), rerollHits)
         chance = add(chance, multiply(multiply(probabilityToGetThisAmountOfOnes, subChance), whatWillBeRerolledItem.probability))
       }
     }
+
     return chance
   }
 
@@ -121,6 +160,46 @@ export class DiceRollsService {
       }
       return finalResult
     }
+  }
+
+  applyBlast(hitsTable: Map<number, MathType>, attack: number, blast: { dice: 3 | 6, plus?: number }): Map<number, MathType> {
+    const maxHitsAfterBlastPossible = attack * (blast.dice + (blast.plus ?? 0))
+    const blastTable = Array(maxHitsAfterBlastPossible + 1).fill(0)
+    blastTable[0] = hitsTable.get(0)
+    for (const hits of fromTo(1, attack)) {
+      const blastDiceSumTable = this.getDiceSumTable(hits, blast.dice)
+      for (const blastDiceSum of blastDiceSumTable.keys()) {
+        const blastDiceSumChance = blastDiceSumTable[blastDiceSum]
+        const hitsAfterBlast = blastDiceSum + (blast.plus ?? 0) * hits
+        blastTable[hitsAfterBlast] = add(
+          blastTable[hitsAfterBlast], 
+          multiply(hitsTable.get(hits) ?? fraction(0), blastDiceSumChance),
+        )
+      }
+    }
+    return new Map(blastTable.entries())
+  }
+
+  getDiceSumTable(diceCount: number, diceMaxSide: number): MathType[] {
+    if (diceCount <= 0) {
+      return [fraction(1)]
+    }
+
+    const sides = fromTo(1, diceMaxSide)
+    let numerators = [1] // start at 0 dice; 100% of getting 0
+    for (const die of fromTo(1, diceCount)) {
+      const maxSum = diceMaxSide * die
+      const newNumerators = Array(maxSum + 1).fill(0)
+      for (const i of numerators.keys()) {
+        for (const side of sides) {
+          const sum = i + side
+          newNumerators[sum] += numerators[i]
+        }
+      }
+      numerators = newNumerators
+    }
+    const denominator = diceMaxSide ** diceCount
+    return numerators.map(numerator => fraction(numerator, denominator))
   }
 
   woundsTable(hitsTable: Map<number, MathType>, defense: 2|3|4|5|6, rerollFunctions: RerollFunction[]): Map<number, MathType> {

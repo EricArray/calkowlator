@@ -9,11 +9,13 @@
             <th>TC</th>
             <th>Elite</th>
             <th>Vicious</th>
+            <th>Reroll 1 hit</th>
+            <th>Blast</th>
             <th>Facing</th>
         </tr>
 
         <tr *ngFor="let attacker of charge.attackers; let index = index">
-            <td><input type="text" placeholder="Attacker #{{ index + 1 }}"></td>
+            <td><input type="text" placeholder="Attacker #{{ index + 1 }}" [(ngModel)]="attacker.name"></td>
             <td><input type="checkbox" [(ngModel)]="attacker.active"></td>
             <td><input type="number" min="2" max="6" [(ngModel)]="attacker.melee"></td>
             <td><input type="number" min="0" max="100" [(ngModel)]="attacker.attack"></td>
@@ -21,6 +23,15 @@
             <td><input type="number" min="0" max="6" [(ngModel)]="attacker.tc"></td>
             <td><input type="checkbox" [(ngModel)]="attacker.elite"></td>
             <td><input type="checkbox" [(ngModel)]="attacker.vicious"></td>
+            <td><input type="checkbox" [(ngModel)]="attacker.reroll1hit"></td>
+            <td>
+                <select [(ngModel)]="attacker.blastDice">
+                    <option [ngValue]="null"></option>
+                    <option [ngValue]="3">D3</option>
+                    <option [ngValue]="6">D6</option>
+                </select>
+                <input type="number" min="0" max="6" [(ngModel)]="attacker.blastPlus">
+            </td>
             <td>
                 <select [(ngModel)]="attacker.facing">
                     <option [ngValue]="'front'">Front</option>
@@ -28,7 +39,10 @@
                     <option [ngValue]="'rear'">Rear</option>
                 </select>
             </td>
-            <td><button (click)="removeAttacker(index)">Remove</button></td>
+            <td>
+                <button (click)="duplicateAttacker(index)">Duplicate</button>
+                <button (click)="removeAttacker(index)">Remove</button>
+            </td>
         </tr>
 
         <tr>

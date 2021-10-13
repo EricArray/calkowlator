@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { equal, typeOf, fraction } from 'mathjs';
 
-import { DiceRollsService, rerollAllOnes } from './dice-rolls.service';
+import { DiceRollsService, rerollAllOnes, rerollUpToOneDice } from './dice-rolls.service';
 
 function customEqualityTestForFractions(first: any, second: any): boolean | undefined {
   if (typeOf(first) === 'Fraction' && typeOf(second) === 'Fraction') {
@@ -80,6 +80,52 @@ describe('DiceRollsService', () => {
       expect(service.hitsTable({ attack: 1, melee: 3, rerollFunctions: [rerollAllOnes()] })).toEqual(new Map([
         [0, fraction(16, 72)],
         [1, fraction(56, 72)],
+      ]))
+    })
+    it('attack: 2, melee: 4+, reroll up to 1 dice', () => {
+      expect(service.hitsTable({ attack: 2, melee: 4, rerollFunctions: [rerollUpToOneDice()] })).toEqual(new Map([
+        [0, fraction(1, 8)],
+        [1, fraction(3, 8)],
+        [2, fraction(4, 8)],
+      ]))
+    })
+    it('attack: 1, melee: 4+, blast D3', () => {
+      expect(service.hitsTable({ attack: 1, melee: 4, blast: { dice: 3 } })).toEqual(new Map([
+        [0, fraction(1, 2)],
+        [1, fraction(1, 6)],
+        [2, fraction(1, 6)],
+        [3, fraction(1, 6)],
+      ]))
+    })
+    it('attack: 1, melee: 4+, blast D6', () => {
+      expect(service.hitsTable({ attack: 1, melee: 4, blast: { dice: 6 } })).toEqual(new Map([
+        [0, fraction(1, 2)],
+        [1, fraction(1, 12)],
+        [2, fraction(1, 12)],
+        [3, fraction(1, 12)],
+        [4, fraction(1, 12)],
+        [5, fraction(1, 12)],
+        [6, fraction(1, 12)],
+      ]))
+    })
+    it('attack: 1, melee: 4+, blast D3 + 1', () => {
+      expect(service.hitsTable({ attack: 1, melee: 4, blast: { dice: 3, plus: 1 } })).toEqual(new Map([
+        [0, fraction(1, 2)],
+        [1, fraction(0)],
+        [2, fraction(1, 6)],
+        [3, fraction(1, 6)],
+        [4, fraction(1, 6)],
+      ]))
+    })
+    it('attack: 2, melee: 4+, blast D3', () => {
+      expect(service.hitsTable({ attack: 2, melee: 4, blast: { dice: 3 } })).toEqual(new Map([
+        [0, fraction(1, 4)],
+        [1, fraction(1, 6)],
+        [2, fraction(7, 36)],
+        [3, fraction(8, 36)],
+        [4, fraction(3, 36)],
+        [5, fraction(2, 36)],
+        [6, fraction(1, 36)],
       ]))
     })
   })

@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { format, Fraction, map, MathType, max, multiply, number, sum } from 'mathjs';
 import { Charge, ChargeInputComponent } from './charge-input/charge-input/charge-input.component';
-import { DiceRollsService, Melee, rerollAllOnes } from './services/dice-rolls.service';
+import { DiceRollsService, Melee, rerollAllOnes, rerollUpToOneDice } from './services/dice-rolls.service';
 
 @Component({
   selector: 'app-root',
@@ -47,10 +47,18 @@ export class AppComponent {
             if (attacker.facing === 'rear') {
               modifiedAttack *= 3
             }
+            const rerollFunctions = []
+            if (attacker.elite) {
+              rerollFunctions.push(rerollAllOnes())
+            }
+            if (attacker.reroll1hit) {
+              rerollFunctions.push(rerollUpToOneDice())
+            }
             const hitsTable = this.diceRollsService.hitsTable({
               attack: modifiedAttack,
               melee: attacker.melee,
-              rerollFunctions: attacker.elite ? [rerollAllOnes()] : []
+              rerollFunctions,
+              blast: attacker.blastDice ? { dice: attacker.blastDice, plus: attacker.blastPlus } : undefined
             })
 
             const modifiedDefense = charge.defender.defense - ((attacker.cs ?? 0) + (attacker.tc ?? 0))

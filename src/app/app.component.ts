@@ -1,6 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { format, Fraction, map, MathType, max, multiply, number, sum } from 'mathjs';
-import { Charge, ChargeInputComponent } from './charge-input/charge-input/charge-input.component';
+import { Charge, ChargeInputComponent } from './charge-input/charge-input.component';
 import { DiceRollsService, Melee, rerollAllOnes, rerollUpToOneDice } from './services/dice-rolls.service';
 
 @Component({

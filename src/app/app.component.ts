@@ -1,13 +1,36 @@
 import { Component } from '@angular/core';
-import { format, Fraction, map, MathType, multiply, number, sum } from 'mathjs';
+import { format, Fraction, map, MathType, max, multiply, number, sum } from 'mathjs';
 import { DiceRollsService, Melee, rerollAllOnes } from './services/dice-rolls.service';
 
 interface Attacker {
   active: boolean;
   melee: Melee;
   attack: number;
+  cs?: number,
+  tc?: number,
   elite: boolean;
   vicious: boolean;
+  facing: 'front' | 'flank' | 'rear'
+}
+
+function defaultAttacker(): Attacker {
+  return {
+    active: true,
+    melee: 4,
+    attack: 2,
+    elite: false,
+    vicious: false,
+    facing: 'front',
+  }
+}
+
+interface Defender {
+  defense: 2 | 3 | 4 | 5 | 6;
+}
+
+interface Charge {
+  attackers: Attacker[];
+  defender: Defender;
 }
  
 @Component({
@@ -16,90 +39,101 @@ interface Attacker {
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  attackers: Attacker[] = [
+  charges: Charge[] = [
     {
-      active: true,
-      melee: 4,
-      attack: 2,
-      elite: false,
-      vicious: false,
+      attackers: [ defaultAttacker() ],
+      defender: {
+        defense: 4,
+      },
     },
     {
-      active: true,
-      melee: 4,
-      attack: 2,
-      elite: false,
-      vicious: false,
-    }
+      attackers: [ defaultAttacker() ],
+      defender: {
+        defense: 4,
+      },
+    },
   ]
-  defense: 2|3|4|5|6 = 4
 
-  result: { hits: number, fraction: string, percent: string }[] | null = null
+  results: {
+    average: number;
+    displayTable: { hits: number, fraction: string, percent: string }[];
+  }[] = []
+  averageDifference: number = 0;
   difference: { hits: number, fraction: string, percent: string }[] | null = null
-  average = 0
-  averageFraction = ''
   error = false
 
   constructor(private diceRollsService: DiceRollsService) {}
 
-  addAttacker(): void {
-    this.attackers = [
-      ...this.attackers,
-      {
-        active: true,
-        melee: 4,
-        attack: 2,
-        elite: false,
-        vicious: false,
-      }
+  addAttacker(charge: Charge): void {
+    charge.attackers = [
+      ...charge.attackers,
+      defaultAttacker()
     ]
   }
 
-  removeAttacker(removeIndex: number): void {
-    this.attackers = this.attackers.filter((attacker, index) => index !== removeIndex)
+  removeAttacker(charge: Charge, removeIndex: number): void {
+    charge.attackers = charge.attackers.filter((attacker, index) => index !== removeIndex)
   }
 
   calculate(): void {
     this.error = false
     try {
-      const woundsTables = this.attackers
-        .filter(attacker => attacker.active)
-        .map(attacker => {
-          const hitsTable = this.diceRollsService.hitsTable({
-            attack: attacker.attack,
-            melee: attacker.melee,
-            rerollFunctions: attacker.elite ? [rerollAllOnes()] : []
+      const chargeTables = this.charges.map(charge => {
+        const woundsTables = charge.attackers
+          .filter(attacker => attacker.active)
+          .map(attacker => {
+            let modifiedAttack = attacker.attack;
+            if (attacker.facing === 'flank') {
+              modifiedAttack *= 2
+            }
+            if (attacker.facing === 'rear') {
+              modifiedAttack *= 3
+            }
+            const hitsTable = this.diceRollsService.hitsTable({
+              attack: modifiedAttack,
+              melee: attacker.melee,
+              rerollFunctions: attacker.elite ? [rerollAllOnes()] : []
+            })
+
+            const modifiedDefense = charge.defender.defense - ((attacker.cs ?? 0) + (attacker.tc ?? 0))
+            return this.diceRollsService.woundsTable(
+              hitsTable,
+              modifiedDefense > 6 ? 6 : modifiedDefense < 2 ? 2 : modifiedDefense as any,
+              attacker.vicious ? [rerollAllOnes()] : [])
           })
 
-          return this.diceRollsService.woundsTable(
-            hitsTable,
-            this.defense,
-            attacker.vicious ?[rerollAllOnes()] : [])
-        })
+        return this.diceRollsService.combineTables(woundsTables)
+      })
 
-      const table = this.diceRollsService.combineTables(woundsTables)
-      // const difference = this.diceRollsService.differenceTable(tableA, tableB)
+      this.results = chargeTables.map(chargeTable => {
+        const average = this.getAverage(chargeTable)
 
-      this.result = []
-      for (const entry of table.entries()) {
-        this.result.push({
+        const displayTable = []
+        for (const entry of chargeTable) {
+          displayTable.push({
+            hits: entry[0],
+            fraction: format(entry[1]),
+            percent: format(number(entry[1] as any * 100)) + '%',
+          })
+        }
+        
+        return {
+          average,
+          displayTable
+        }
+      })
+
+      const differenceTable = this.diceRollsService.differenceTable(chargeTables[0], chargeTables[1])
+      
+      this.averageDifference = this.getAverage(differenceTable)
+      this.difference = []
+      for (const entry of differenceTable) {
+        this.difference.push({
           hits: entry[0],
           fraction: format(entry[1]),
           percent: format(number(entry[1] as any * 100)) + '%',
         })
       }
-      
-      // this.difference = []
-      // for (const entry of difference.entries()) {
-      //   this.difference.push({
-      //     hits: entry[0],
-      //     fraction: format(entry[1]),
-      //     percent: format(number(entry[1] as any * 100)) + '%',
-      //   })
-      // }
-
-      this.average = this.getAverage(table)
-      this.averageFraction = format(this.average)
     } catch (error) {
       console.error(error)
       this.error = true

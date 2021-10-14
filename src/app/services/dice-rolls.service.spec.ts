@@ -1,10 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 import { equal, typeOf, fraction } from 'mathjs';
+import { rerollAllOnes, rerollUpToOneDice } from '../models/reroll-function';
 
-import { DiceRollsService, rerollAllOnes, rerollUpToOneDice } from './dice-rolls.service';
+import { DiceRollsService } from './dice-rolls.service';
 
 function customEqualityTestForFractions(first: any, second: any): boolean | undefined {
-  if (typeOf(first) === 'Fraction' && typeOf(second) === 'Fraction') {
+  if (typeOf(first) === 'Fraction' || typeOf(second) === 'Fraction') {
     return equal(first, second) as boolean
   }
   return undefined
@@ -126,6 +127,24 @@ describe('DiceRollsService', () => {
         [4, fraction(3, 36)],
         [5, fraction(2, 36)],
         [6, fraction(1, 36)],
+      ]))
+    })
+    it('attack: 1, melee: 4+, blast undefined', () => {
+      expect(service.hitsTable({ attack: 1, melee: 4, blast: { } })).toEqual(new Map([
+        [0, fraction(1, 1)],
+      ]))
+    })
+    it('attack: 1, melee: 4+, blast 1', () => {
+      expect(service.hitsTable({ attack: 1, melee: 4, blast: { plus: 1 } })).toEqual(new Map([
+        [0, fraction(1, 2)],
+        [1, fraction(1, 2)],
+      ]))
+    })
+    it('attack: 1, melee: 4+, blast 2', () => {
+      expect(service.hitsTable({ attack: 1, melee: 4, blast: { plus: 2} })).toEqual(new Map([
+        [0, fraction(1, 2)],
+        [1, fraction(0, 1)],
+        [2, fraction(1, 2)],
       ]))
     })
   })

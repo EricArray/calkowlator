@@ -1,0 +1,41 @@
+<span>{{ ability.name }} </span>
+<span [ngSwitch]="ability.valueType">
+    <style>
+        input[type="number"] {
+            width: 2.5em;
+        }
+    </style>
+
+    <span *ngSwitchCase="'number'">
+        <input type="number" min="0" max="99" [(ngModel)]="ability.value">
+    </span>
+    
+    <span *ngSwitchCase="'dice-plus-number'">
+        (
+        <select [(ngModel)]="ability.value.dice">
+            <option [ngValue]="null"></option>
+            <option [ngValue]="3">D3</option>
+            <option [ngValue]="6">D6</option>
+        </select>
+        +
+        <input type="number" min="0" max="6" [(ngModel)]="ability.value.plus">
+        )
+    </span>
+    
+    <span *ngSwitchCase="'reroll'">
+        (
+        <select [(ngModel)]="ability.value.dice">
+            <option [ngValue]="null"></option>
+            <option [ngValue]="3">D3</option>
+            <option [ngValue]="6">D6</option>
+        </select>
+        +
+        <input type="number" min="0" max="6" [(ngModel)]="ability.value.plus">
+        )
+        <select [(ngModel)]="ability.value.when">
+            <option [ngValue]="'to-hit'">to hit</option>
+            <option [ngValue]="'to-wound'">to wound</option>
+        </select>
+    </span>
+</span>
+<button (click)="remove.emit()">X</button>

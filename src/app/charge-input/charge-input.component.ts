@@ -1,20 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Melee } from 'src/app/services/dice-rolls.service';
-
-interface Attacker {
-  name?: string;
-  active: boolean;
-  melee: Melee;
-  attack: number;
-  cs?: number,
-  tc?: number,
-  elite: boolean;
-  vicious: boolean;
-  reroll1hit?: boolean;
-  blastDice?: 3 | 6;
-  blastPlus?: number;
-  facing: 'front' | 'flank' | 'rear';
-}
+import { Ability, Blast, Brutal, Elite, Vicious } from '../models/ability';
+import { Attacker } from '../models/attacker';
+import { Defender } from '../models/defender';
 
 function defaultAttacker(): Attacker {
   return {
@@ -24,11 +11,12 @@ function defaultAttacker(): Attacker {
     elite: false,
     vicious: false,
     facing: 'front',
+    abilities: [],
+    rerolls: {
+      "to-hit": [],
+      "to-wound": [],
+    },
   }
-}
-
-interface Defender {
-  defense: 2 | 3 | 4 | 5 | 6;
 }
 
 export interface Charge {
@@ -49,6 +37,14 @@ export class ChargeInputComponent  {
     },
   }
 
+  abilityOptions = [
+    { name: 'Elite', create: () => new Elite() },
+    { name: 'Vicious', create: () => new Vicious() },
+    // { name: 'Reroll', create: () => new Reroll() },
+    { name: 'Blast', create: () => new Blast() },
+    // { name: 'Brutal', create: () => new Brutal() },
+  ]
+
   constructor() { }
 
   addAttacker(): void {
@@ -65,6 +61,19 @@ export class ChargeInputComponent  {
 
   removeAttacker(removeIndex: number): void {
     this.charge.attackers = this.charge.attackers.filter((attacker, index) => index !== removeIndex)
+  }
+
+  addAbility(attacker: Attacker, abilityOption: any): void {
+    const newAbilityInstance = abilityOption.create()
+    attacker.abilities.push(newAbilityInstance)
+  }
+
+  removeAbility(attacker: Attacker, abilityToRemove: Ability): void {
+    attacker.abilities = attacker.abilities.filter(ability => ability !== abilityToRemove)
+  }
+
+  disableAbilityOption(attacker: Attacker, abilityOption: any): boolean {
+    return attacker.abilities.some(ability => ability.name === abilityOption.name)
   }
 
 }

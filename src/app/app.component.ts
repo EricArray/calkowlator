@@ -1,7 +1,14 @@
 import { Component, ViewChild } from '@angular/core';
 import { format, Fraction, map, MathType, max, multiply, number, sum } from 'mathjs';
 import { Charge, ChargeInputComponent } from './charge-input/charge-input.component';
-import { DiceRollsService, Melee, rerollAllOnes, rerollUpToOneDice } from './services/dice-rolls.service';
+import { Attacker } from './models/attacker';
+import { Defender } from './models/defender';
+import { rerollAllOnes } from './models/reroll-function';
+import { DiceRollsService } from './services/dice-rolls.service';
+
+function formatPercent(value: number): string {
+  return format(number(value * 100), 2) + '%'
+}
 
 @Component({
   selector: 'app-root',
@@ -17,6 +24,7 @@ export class AppComponent {
     displayTable: { hits: number, fraction: string, percent: string }[];
   }[] = []
   averageDifference: number = 0;
+  averageDifferencePercent: string = '';
   difference: { hits: number, fraction: string, percent: string }[] | null = null
   error = false
 
@@ -39,6 +47,7 @@ export class AppComponent {
       const chargeTables = this.charges.map(charge => {
         const woundsTables = charge.attackers
           .filter(attacker => attacker.active)
+          .map(attacker => this.applyAttackerAbilities(attacker, charge.defender))
           .map(attacker => {
             let modifiedAttack = attacker.attack;
             if (attacker.facing === 'flank') {
@@ -47,25 +56,32 @@ export class AppComponent {
             if (attacker.facing === 'rear') {
               modifiedAttack *= 3
             }
-            const rerollFunctions = []
+
+            console.log('modified attacker', attacker.name, attacker)
+
+            const rerollFunctionsToHit = [...attacker.rerolls['to-hit']]
+            // TODO: remove elite and vicious variables, and use rerollFunctions
             if (attacker.elite) {
-              rerollFunctions.push(rerollAllOnes())
-            }
-            if (attacker.reroll1hit) {
-              rerollFunctions.push(rerollUpToOneDice())
+              rerollFunctionsToHit.push(rerollAllOnes())
             }
             const hitsTable = this.diceRollsService.hitsTable({
               attack: modifiedAttack,
               melee: attacker.melee,
-              rerollFunctions,
-              blast: attacker.blastDice ? { dice: attacker.blastDice, plus: attacker.blastPlus } : undefined
+              rerollFunctions: rerollFunctionsToHit,
+              blast: attacker.blast
             })
 
             const modifiedDefense = charge.defender.defense - ((attacker.cs ?? 0) + (attacker.tc ?? 0))
+            const rerollFunctionsToWound = [...attacker.rerolls['to-wound']]
+            // TODO: remove elite and vicious variables, and use rerollFunctions
+            if (attacker.vicious) {
+              rerollFunctionsToWound.push(rerollAllOnes())
+            }
             return this.diceRollsService.woundsTable(
               hitsTable,
               modifiedDefense > 6 ? 6 : modifiedDefense < 2 ? 2 : modifiedDefense as any,
-              attacker.vicious ? [rerollAllOnes()] : [])
+              rerollFunctionsToWound,
+            )
           })
 
         return this.diceRollsService.combineTables(woundsTables)
@@ -78,8 +94,8 @@ export class AppComponent {
         for (const entry of chargeTable) {
           displayTable.push({
             hits: entry[0],
-            fraction: format(entry[1]),
-            percent: format(number(entry[1] as any * 100)) + '%',
+            fraction: format(entry[1], 2),
+            percent: formatPercent(entry[1] as any),
           })
         }
         
@@ -92,18 +108,30 @@ export class AppComponent {
       const differenceTable = this.diceRollsService.differenceTable(chargeTables[0], chargeTables[1])
       
       this.averageDifference = this.getAverage(differenceTable)
+
+      const differenceRelativeToCharge1 = (this.results[0].average - this.results[1].average) / (this.results[1].average)
+      this.averageDifferencePercent = formatPercent(differenceRelativeToCharge1 as any),
+
       this.difference = []
       for (const entry of differenceTable) {
         this.difference.push({
           hits: entry[0],
-          fraction: format(entry[1]),
-          percent: format(number(entry[1] as any * 100)) + '%',
+          fraction: format(entry[1], 2),
+          percent: formatPercent(entry[1] as any),
         })
       }
     } catch (error) {
       console.error(error)
       this.error = true
     }
+  }
+
+  applyAttackerAbilities(attacker: Attacker, defender: Defender): Attacker {
+    let modifiedAttacker = attacker
+    for (const ability of attacker.abilities) {
+      modifiedAttacker = ability.applyModification(modifiedAttacker, defender)
+    }
+    return modifiedAttacker
   }
 
   getAverage(result: Map<number, MathType>): number {

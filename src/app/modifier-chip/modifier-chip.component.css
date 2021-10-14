@@ -1,0 +1,8 @@
+:host {
+    background-color: lightgreen;
+    border: 2px solid green;
+    border-radius: 50px;
+    padding-left: 10px;
+    padding-right: 10px;
+    display: inline-block;
+}

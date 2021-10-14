@@ -2,35 +2,35 @@
     <table class="inputs-table">
         <tr style="border-bottom: 1px solid black">
             <th>Attacker</th>
-            <th>Active</th>
             <th>Me</th>
             <th>Att</th>
             <th>CS</th>
             <th>TC</th>
-            <th>Elite</th>
-            <th>Vicious</th>
-            <th>Reroll 1 hit</th>
-            <th>Blast</th>
+            <th>Abilities</th>
             <th>Facing</th>
         </tr>
 
         <tr *ngFor="let attacker of charge.attackers; let index = index">
             <td><input type="text" placeholder="Attacker #{{ index + 1 }}" [(ngModel)]="attacker.name"></td>
-            <td><input type="checkbox" [(ngModel)]="attacker.active"></td>
             <td><input type="number" min="2" max="6" [(ngModel)]="attacker.melee"></td>
             <td><input type="number" min="0" max="100" [(ngModel)]="attacker.attack"></td>
             <td><input type="number" min="0" max="6" [(ngModel)]="attacker.cs"></td>
             <td><input type="number" min="0" max="6" [(ngModel)]="attacker.tc"></td>
-            <td><input type="checkbox" [(ngModel)]="attacker.elite"></td>
-            <td><input type="checkbox" [(ngModel)]="attacker.vicious"></td>
-            <td><input type="checkbox" [(ngModel)]="attacker.reroll1hit"></td>
-            <td>
-                <select [(ngModel)]="attacker.blastDice">
-                    <option [ngValue]="null"></option>
-                    <option [ngValue]="3">D3</option>
-                    <option [ngValue]="6">D6</option>
+            <td style="max-width: 300px">
+                <app-modifier-chip
+                    *ngFor="let ability of attacker.abilities"
+                    [ability]="ability"
+                    (remove)="removeAbility(attacker, ability)"
+                ></app-modifier-chip>
+                <select [ngModel]="null" (ngModelChange)="addAbility(attacker, $event)">
+                    <option
+                        *ngFor="let abilityOption of abilityOptions"
+                        [disabled]="disableAbilityOption(attacker, abilityOption)"
+                        [ngValue]="abilityOption"
+                    >
+                        {{abilityOption.name}}
+                    </option>
                 </select>
-                <input type="number" min="0" max="6" [(ngModel)]="attacker.blastPlus">
             </td>
             <td>
                 <select [(ngModel)]="attacker.facing">

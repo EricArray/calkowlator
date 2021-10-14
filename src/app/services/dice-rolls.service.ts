@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { add, factorial, fraction, MathType, max, multiply, pow, round, subtract } from 'mathjs';
+import { RerollFunction } from '../models/reroll-function';
 import { fromTo, fromZeroTo } from '../util';
 
 export type Melee = 2 | 3 | 4 | 5 | 6;
@@ -13,32 +14,8 @@ export interface HitsParams {
   melee: Melee;
   rerollFunctions?: RerollFunction[];
   blast?: {
-    dice: 3 | 6;
+    dice?: 3 | 6;
     plus?: number;
-  }
-}
-
-// reroll types:
-// * all ones
-// * up to 3 ones
-// * up to 1 dice
-// * up to 3 dice
-// * up to D3 dice
-
-type RerollFunction = (ones: number, notOnes: number) => { willRerollOnes: number, willRerollNotOnes: number, probability?: MathType }[]
-
-export function rerollAllOnes(): RerollFunction {
-  return (ones, notOnes) => [{ willRerollOnes: ones, willRerollNotOnes: 0 }]
-}
-export function rerollUpToOneDice(): RerollFunction {
-  return (ones, notOnes) => {
-    if (notOnes >= 1) {
-      return [{ willRerollOnes: 0, willRerollNotOnes: 1 }]
-    } else if (ones >= 1) {
-      return [{ willRerollOnes: 1, willRerollNotOnes: 0 }]
-    } else {
-      return [{ willRerollOnes: 0, willRerollNotOnes: 0 }]
-    }
   }
 }
 
@@ -162,17 +139,16 @@ export class DiceRollsService {
     }
   }
 
-  applyBlast(hitsTable: Map<number, MathType>, attack: number, blast: { dice: 3 | 6, plus?: number }): Map<number, MathType> {
-    const maxHitsAfterBlastPossible = attack * (blast.dice + (blast.plus ?? 0))
+  applyBlast(hitsTable: Map<number, MathType>, attack: number, blast: { dice?: 3 | 6, plus?: number }): Map<number, MathType> {
+    const maxHitsAfterBlastPossible = attack * ((blast?.dice ?? 0) + (blast.plus ?? 0))
     const blastTable = Array(maxHitsAfterBlastPossible + 1).fill(0)
     blastTable[0] = hitsTable.get(0)
     for (const hits of fromTo(1, attack)) {
-      const blastDiceSumTable = this.getDiceSumTable(hits, blast.dice)
-      for (const blastDiceSum of blastDiceSumTable.keys()) {
-        const blastDiceSumChance = blastDiceSumTable[blastDiceSum]
+      const blastDiceSumTable = this.getDiceSumTable(hits, blast.dice ?? 0)
+      for (const [blastDiceSum, blastDiceSumChance] of blastDiceSumTable.entries()) {
         const hitsAfterBlast = blastDiceSum + (blast.plus ?? 0) * hits
         blastTable[hitsAfterBlast] = add(
-          blastTable[hitsAfterBlast], 
+          blastTable[hitsAfterBlast],
           multiply(hitsTable.get(hits) ?? fraction(0), blastDiceSumChance),
         )
       }
@@ -181,7 +157,7 @@ export class DiceRollsService {
   }
 
   getDiceSumTable(diceCount: number, diceMaxSide: number): MathType[] {
-    if (diceCount <= 0) {
+    if (diceCount <= 0 || diceMaxSide <= 0) {
       return [fraction(1)]
     }
 

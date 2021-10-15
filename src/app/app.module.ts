@@ -7,12 +7,14 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ChargeInputComponent } from './charge-input/charge-input.component';
 import { ModifierChipComponent } from './modifier-chip/modifier-chip.component';
+import { ChargeOutputComponent } from './charge-output/charge-output.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ChargeInputComponent,
-    ModifierChipComponent
+    ModifierChipComponent,
+    ChargeOutputComponent
   ],
   imports: [
     BrowserModule,

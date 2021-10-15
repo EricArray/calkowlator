@@ -9,10 +9,6 @@ import { MathType } from "mathjs"
 
 export type RerollFunction = (ones: number, notOnes: number) => { willRerollOnes: number, willRerollNotOnes: number, probability?: MathType }[]
 
-export function rerollAllOnes(): RerollFunction {
-  return (ones, notOnes) => [{ willRerollOnes: ones, willRerollNotOnes: 0 }]
-}
-
 export function rerollUpToOneDice(): RerollFunction {
   return (ones, notOnes) => {
     if (notOnes >= 1) {

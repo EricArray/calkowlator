@@ -5,7 +5,6 @@ import { Attacker } from './models/attacker';
 import { ChargeResult } from './models/charge-result';
 import { Defender } from './models/defender';
 import { NerveTest } from './models/nerve-test';
-import { rerollAllOnes } from './models/reroll-function';
 import { DiceRollsService } from './services/dice-rolls.service';
 
 function formatPercent(value: number): string {
@@ -64,29 +63,21 @@ export class AppComponent {
 
         const attackersResults = modifiedAttackers
           .map(attacker => {
-            const rerollFunctionsToHit = [...attacker.rerolls['to-hit']]
-            // TODO: remove elite and vicious variables, and use rerollFunctions
-            if (attacker.elite) {
-              rerollFunctionsToHit.push(rerollAllOnes())
-            }
             const hitsTable = this.diceRollsService.hitsTable({
               attack: attacker.attack,
               melee: attacker.melee,
-              rerollFunctions: rerollFunctionsToHit,
+              elite: attacker.elite,
+              rerollFunctions: attacker.rerolls['to-hit'],
               blast: attacker.blast
             })
 
             const modifiedDefense = charge.defender.defense - ((attacker.cs ?? 0) + (attacker.tc ?? 0))
-            const rerollFunctionsToWound = [...attacker.rerolls['to-wound']]
-            // TODO: remove elite and vicious variables, and use rerollFunctions
-            if (attacker.vicious) {
-              rerollFunctionsToWound.push(rerollAllOnes())
-            }
-            const woundsTable = this.diceRollsService.woundsTable(
+            const woundsTable = this.diceRollsService.woundsTable({
               hitsTable,
-              modifiedDefense > 6 ? 6 : modifiedDefense < 2 ? 2 : modifiedDefense as any,
-              rerollFunctionsToWound,
-            )
+              defense: modifiedDefense > 6 ? 6 : modifiedDefense < 2 ? 2 : modifiedDefense as any,
+              vicious: attacker.vicious,
+              rerollFunctions: attacker.rerolls['to-wound'],
+            })
 
             return {
               attacker,

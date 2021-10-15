@@ -14,11 +14,19 @@ export function diceProbability(required: 1 | 2 | 3 | 4 | 5 | 6): MathType {
 export interface HitsParams {
   attack: number;
   melee: Melee;
+  elite: boolean;
   rerollFunctions?: RerollFunction[];
   blast?: {
     dice?: 3 | 6;
     plus?: number;
   }
+}
+
+export interface WoundsParams {
+  hitsTable: Map<number, MathType>;
+  defense: 2|3|4|5|6;
+  vicious: boolean;
+  rerollFunctions: RerollFunction[];
 }
 
 @Injectable({
@@ -47,10 +55,16 @@ export class DiceRollsService {
   }
 
   hitsTable(params: HitsParams): Map<number, MathType> {
-    let table = this.tableOfProbilitiesToGetSuccesses(params.attack, diceProbability(params.melee))
-    if (params.rerollFunctions && params.rerollFunctions.length > 0) {
-      table = this.applyRerollFunctions(table, params.attack, params.melee, params.rerollFunctions)
+    let hitProbability = diceProbability(params.melee)
+    if (params.elite) {
+      // rerolling ones is the same as having 7/6 chance to hit each dice
+      hitProbability = multiply(hitProbability, fraction(7, 6))
     }
+    let table = this.tableOfProbilitiesToGetSuccesses(params.attack, hitProbability)
+    // TODO: rerolls
+    // if (params.rerollFunctions && params.rerollFunctions.length > 0) {
+    //   table = this.applyRerollFunctions(table, params.attack, params.melee, params.rerollFunctions)
+    // }
     if (params.blast) {
       table = this.applyBlast(table, params.attack, params.blast)
     }
@@ -180,14 +194,15 @@ export class DiceRollsService {
     return numerators.map(numerator => fraction(numerator, denominator))
   }
 
-  woundsTable(hitsTable: Map<number, MathType>, defense: 2|3|4|5|6, rerollFunctions: RerollFunction[]): Map<number, MathType> {
+  woundsTable(params: WoundsParams): Map<number, MathType> {
     const woundsTable = new Map<number, MathType>()
 
-    for (const [hits, hitsProbability] of hitsTable) {
+    for (const [hits, hitsProbability] of params.hitsTable) {
       const woundsTableForThisHits = this.hitsTable({
         attack: hits,
-        melee: defense,
-        rerollFunctions,
+        melee: params.defense,
+        elite: params.vicious,
+        rerollFunctions: params.rerollFunctions,
       })
       for (const [wounds, woundsPartialProbibility] of woundsTableForThisHits) {
         woundsTable.set(

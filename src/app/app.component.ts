@@ -4,6 +4,7 @@ import { Charge, ChargeInputComponent } from './charge-input/charge-input.compon
 import { Attacker } from './models/attacker';
 import { ChargeResult } from './models/charge-result';
 import { Defender } from './models/defender';
+import { NerveTest } from './models/nerve-test';
 import { rerollAllOnes } from './models/reroll-function';
 import { DiceRollsService } from './services/dice-rolls.service';
 
@@ -100,11 +101,13 @@ export class AppComponent {
         const hitsTable = this.diceRollsService.combineTables(hitsTables)
         const woundsTable = this.diceRollsService.combineTables(woundsTables)
         
+        const nerveTest = this.diceRollsService.nerveTest(woundsTable)
+
         return <ChargeResult>{
           charge,
           hitsTable,
           woundsTable,
-          average: this.getAverage(woundsTable)
+          nerveTest,
         }
       })
     } catch (error) {
@@ -119,11 +122,6 @@ export class AppComponent {
       modifiedAttacker = ability.applyModification(modifiedAttacker, defender)
     }
     return modifiedAttacker
-  }
-
-  getAverage(result: Map<number, MathType>): number {
-    const v: Fraction[] = [...result.entries()].map(([hits, probability]) => multiply(hits, probability) as Fraction)
-    return sum(...v)
   }
 
 }

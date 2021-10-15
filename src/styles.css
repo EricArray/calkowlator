@@ -1,1 +1,6 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Domine&display=swap');
+body {
+    font-family: 'Domine', serif;
+    font-variant: small-caps;
+    background-color: rgb(255, 241, 236);
+}

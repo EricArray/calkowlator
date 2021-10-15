@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { add, factorial, fraction, MathType, max, multiply, pow, round, subtract } from 'mathjs';
+import { NerveTest } from '../models/nerve-test';
 import { RerollFunction } from '../models/reroll-function';
 import { fromTo, fromZeroTo } from '../util';
 
@@ -237,4 +238,13 @@ export class DiceRollsService {
     }
     return differenceTable
   }
+
+  nerveTest(woundsTable: Map<number, MathType>): NerveTest {
+    return {
+      steady: fraction(3, 6),
+      waver: fraction(2, 6),
+      rout: fraction(1, 6),
+    }
+  }
+
 }

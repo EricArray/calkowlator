@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { add, factorial, fraction, MathType, max, multiply, pow, round, subtract } from 'mathjs';
-import { Defender } from '../models/defender';
-import { NerveTest } from '../models/nerve-test';
-import { RerollFunction } from '../models/reroll-function';
+import { Defender } from '@models/defender';
+import { NerveTest } from '@models/nerve-test';
+import { RerollFunction } from '@models/reroll-function';
 import { fromTo, fromZeroTo } from '../util';
 
 export type Melee = 2 | 3 | 4 | 5 | 6;

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Ability, Blast, Brutal, Elite, Vicious } from '../models/ability';
-import { Attacker } from '../models/attacker';
-import { Defender } from '../models/defender';
+import { Ability, Blast, Brutal, Elite, Vicious } from '@models/ability';
+import { Attacker } from '@models/attacker';
+import { Defender } from '@models/defender';
 
 function defaultAttacker(): Attacker {
   return {

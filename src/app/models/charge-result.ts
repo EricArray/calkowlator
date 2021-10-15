@@ -1,5 +1,5 @@
 import { Fraction } from "mathjs";
-import { Charge } from "../charge-input/charge-input.component";
+import { Charge } from "../components/charge-input/charge-input.component";
 import { NerveTest } from "./nerve-test";
 
 export interface ChargeResult {

@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { equal, typeOf, fraction } from 'mathjs';
-import { rerollAllOnes, rerollUpToOneDice } from '../models/reroll-function';
+import { rerollUpToOneDice } from '@models/reroll-function';
 
 import { DiceRollsService } from './dice-rolls.service';
 

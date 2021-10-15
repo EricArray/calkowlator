@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { Ability, Elite } from '../models/ability';
+import { Ability, Elite } from '@models/ability';
 
 @Component({
   selector: 'app-modifier-chip',

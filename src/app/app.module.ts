@@ -5,9 +5,9 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { ChargeInputComponent } from './charge-input/charge-input.component';
-import { ModifierChipComponent } from './modifier-chip/modifier-chip.component';
-import { ChargeOutputComponent } from './charge-output/charge-output.component';
+import { ChargeInputComponent } from './components/charge-input/charge-input.component';
+import { ModifierChipComponent } from './components/modifier-chip/modifier-chip.component';
+import { ChargeOutputComponent } from './components/charge-output/charge-output.component';
 
 @NgModule({
   declarations: [

@@ -1,8 +1,8 @@
 import { AfterViewChecked, AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { Chart, ChartData, LineController, registerables } from 'chart.js';
 import { format, max, number } from 'mathjs';
-import { ChargeResult } from '../models/charge-result';
-import { fromZeroTo } from '../util';
+import { ChargeResult } from '@models/charge-result';
+import { fromZeroTo } from '@app/util';
 
 @Component({
   selector: 'app-charge-output',

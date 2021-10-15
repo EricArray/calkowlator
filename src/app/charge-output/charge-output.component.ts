@@ -112,7 +112,8 @@ export class ChargeOutputComponent implements AfterViewInit, OnChanges {
   private buildWoundsData(): ChartData {
     const COLORS = ['red', 'green', 'blue']
     const topWounds = max(
-      ...this.results.map(chargeResult => max(...chargeResult.woundsTable.keys()))
+      0,
+      ...this.results.map(chargeResult => max(0, ...chargeResult.woundsTable.keys()))
     )
     const labels = fromZeroTo(topWounds)
 

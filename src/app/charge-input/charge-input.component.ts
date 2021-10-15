@@ -7,7 +7,7 @@ function defaultAttacker(): Attacker {
   return {
     active: true,
     melee: 4,
-    attack: 2,
+    attack: 12,
     elite: false,
     vicious: false,
     facing: 'front',
@@ -33,7 +33,11 @@ export class ChargeInputComponent  {
   charge: Charge = {
     attackers: [ defaultAttacker() ],
     defender: {
-      defense: 4,
+      defense: 5,
+      nerve: {
+        waver: 15,
+        rout: 17,
+      }
     },
   }
 

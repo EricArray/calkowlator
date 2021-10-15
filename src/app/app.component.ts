@@ -101,7 +101,7 @@ export class AppComponent {
         const hitsTable = this.diceRollsService.combineTables(hitsTables)
         const woundsTable = this.diceRollsService.combineTables(woundsTables)
         
-        const nerveTest = this.diceRollsService.nerveTest(woundsTable)
+        const nerveTest = this.diceRollsService.nerveTest(woundsTable, charge.defender)
 
         return <ChargeResult>{
           charge,

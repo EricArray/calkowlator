@@ -1,6 +1,6 @@
 import { AfterViewChecked, AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { Chart, ChartData, LineController, registerables } from 'chart.js';
-import { max, number } from 'mathjs';
+import { format, max, number } from 'mathjs';
 import { ChargeResult } from '../models/charge-result';
 import { fromZeroTo } from '../util';
 
@@ -54,7 +54,13 @@ export class ChargeOutputComponent implements AfterViewInit, OnChanges {
             title: {
               display: true,
               text: 'Wounds'
-            }
+            },
+            tooltip: {
+              position: 'nearest',
+              callbacks: {
+                label: (context: any) => context.dataset.label + ': ' + format(context.raw * 100, 2) + ' %'
+              }
+            },
           }
         },
       });
@@ -77,7 +83,12 @@ export class ChargeOutputComponent implements AfterViewInit, OnChanges {
             title: {
               display: true,
               text: 'Nerve Test'
-            }
+            },
+            tooltip: {
+              callbacks: {
+                label: (context: any) => context.label + ': ' + format(context.raw * 100, 2) + ' %'
+              }
+            },
           }
         },
       });
@@ -106,7 +117,7 @@ export class ChargeOutputComponent implements AfterViewInit, OnChanges {
     const labels = fromZeroTo(topWounds)
 
     const datasets = this.results.map((chargeResult, index) => ({
-      label: 'Charge #' + index,
+      label: 'Charge #' + (index + 1),
       borderColor: COLORS[index],
       backgroundColor: COLORS[index],
       data: labels.map(label => chargeResult.woundsTable.get(label)

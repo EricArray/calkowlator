@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Domine&display=swap');
 body {
     font-family: 'Domine', serif;
-    font-variant: small-caps;
+    /* font-variant: small-caps; */
     background-color: rgb(255, 241, 236);
 }

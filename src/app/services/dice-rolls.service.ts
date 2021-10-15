@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { add, factorial, fraction, MathType, max, multiply, pow, round, subtract } from 'mathjs';
+import { Defender } from '../models/defender';
 import { NerveTest } from '../models/nerve-test';
 import { RerollFunction } from '../models/reroll-function';
 import { fromTo, fromZeroTo } from '../util';
@@ -239,12 +240,49 @@ export class DiceRollsService {
     return differenceTable
   }
 
-  nerveTest(woundsTable: Map<number, MathType>): NerveTest {
-    return {
-      steady: fraction(3, 6),
-      waver: fraction(2, 6),
-      rout: fraction(1, 6),
+  nerveTest(woundsTable: Map<number, MathType>, defender: Defender): NerveTest {
+    const nerveTest = <NerveTest>{
+      steady: fraction(0),
+      waver: fraction(0),
+      rout: fraction(0),
     }
+
+    for (const [wounds, woundsProbability] of woundsTable) {
+      const { steady, waver, rout } = this.nerveTestWithWounds(wounds, defender)
+      nerveTest.steady = add(nerveTest.steady, multiply(woundsProbability, steady))
+      nerveTest.waver = add(nerveTest.waver, multiply(woundsProbability, waver))
+      nerveTest.rout = add(nerveTest.rout, multiply(woundsProbability, rout))
+    }
+
+    return nerveTest
+  }
+
+  private nerveTestWithWounds(wounds: number, defender: Defender): NerveTest {
+    const sumTable2d6 = this.getDiceSumTable(2, 6)
+
+    const toRout = defender.nerve.rout - wounds
+    const toWaver =
+      defender.nerve.waver === 'fearless' || defender.nerve.waver === 0
+        ? 'fearless'
+        : defender.nerve.waver - wounds
+    
+    const nerve = <NerveTest>{
+      steady: fraction(0),
+      waver: fraction(0),
+      rout: fraction(0),
+    }
+
+    for (const [sum2d6, sum2d6probability] of sumTable2d6.entries()) {
+      if (sum2d6 >= toRout) {
+        nerve.rout = add(nerve.rout, sum2d6probability)
+      } else if (toWaver !== 'fearless' && (sum2d6 >= toWaver || sum2d6 === 12)) {
+        nerve.waver = add(nerve.waver, sum2d6probability)
+      } else {
+        nerve.steady = add(nerve.steady, sum2d6probability)
+      }
+    }
+
+    return nerve
   }
 
 }

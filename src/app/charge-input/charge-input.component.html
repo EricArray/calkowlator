@@ -54,12 +54,18 @@
 <span>
     <table class="inputs-table">
         <tr>
-            <th>Defender</th>
-            <th>Defense</th>
+            <td>Defender</td>
+            <td>De</td>
+            <td>Ne</td>
         </tr>
         <tr>
             <td><input type="text" placeholder="Defender"></td>
             <td><input type="number" min="2" max="6" [(ngModel)]="charge.defender.defense"></td>
+            <td>
+                <input type="number" min="0" max="99" [(ngModel)]="charge.defender.nerve.waver">
+                /
+                <input type="number" min="1" max="99" [(ngModel)]="charge.defender.nerve.rout">
+            </td>
         </tr>
     </table>
 </span>

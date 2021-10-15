@@ -3,10 +3,13 @@
     flex-direction: row;
 }
 
-.inputs-table {
-    border: 1px solid black;
+.inputs-table input[type="number"] {
+    width: 70px;
 }
 
-.inputs-table input[type="number"] {
-    width: 40px;
+
+.nerve-input {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 }

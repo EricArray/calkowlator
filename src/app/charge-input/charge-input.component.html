@@ -1,71 +1,95 @@
 <span>
-    <table class="inputs-table">
-        <tr style="border-bottom: 1px solid black">
-            <td>Attacker</td>
-            <td>Me</td>
-            <td>Att</td>
-            <td>CS</td>
-            <td>TC</td>
-            <td>Abilities</td>
-            <td>Facing</td>
-        </tr>
+    <table class="table table-striped  inputs-table">
+        <thead>
+            <tr>
+                <td>Attacker</td>
+                <td>Me</td>
+                <td>Att</td>
+                <td>CS</td>
+                <td>TC</td>
+                <td>Abilities</td>
+                <td>Facing</td>
+            </tr>
+        </thead>
 
-        <tr *ngFor="let attacker of charge.attackers; let index = index">
-            <td><input type="text" placeholder="Attacker #{{ index + 1 }}" [(ngModel)]="attacker.name"></td>
-            <td><input type="number" min="2" max="6" [(ngModel)]="attacker.melee"></td>
-            <td><input type="number" min="0" max="100" [(ngModel)]="attacker.attack"></td>
-            <td><input type="number" min="0" max="6" [(ngModel)]="attacker.cs"></td>
-            <td><input type="number" min="0" max="6" [(ngModel)]="attacker.tc"></td>
-            <td style="max-width: 300px">
-                <app-modifier-chip
-                    *ngFor="let ability of attacker.abilities"
-                    [ability]="ability"
-                    (remove)="removeAbility(attacker, ability)"
-                ></app-modifier-chip>
-                <select [ngModel]="null" (ngModelChange)="addAbility(attacker, $event)">
-                    <option
-                        *ngFor="let abilityOption of abilityOptions"
-                        [disabled]="disableAbilityOption(attacker, abilityOption)"
-                        [ngValue]="abilityOption"
-                    >
-                        {{abilityOption.name}}
-                    </option>
-                </select>
-            </td>
-            <td>
-                <select [(ngModel)]="attacker.facing">
-                    <option [ngValue]="'front'">Front</option>
-                    <option [ngValue]="'flank'">Flank</option>
-                    <option [ngValue]="'rear'">Rear</option>
-                </select>
-            </td>
-            <td>
-                <button (click)="duplicateAttacker(index)">Duplicate</button>
-                <button (click)="removeAttacker(index)">Remove</button>
-            </td>
-        </tr>
-
-        <tr>
-            <button (click)="addAttacker()">Add attacker</button>
-        </tr>
+        <tbody>
+            <tr *ngFor="let attacker of charge.attackers; let index = index">
+                <td><input class="form-control" type="text" placeholder="Attacker #{{ index + 1 }}" [(ngModel)]="attacker.name"></td>
+                <td><input class="form-control" type="number" min="2" max="6" [(ngModel)]="attacker.melee"></td>
+                <td><input class="form-control" type="number" min="0" max="100" [(ngModel)]="attacker.attack"></td>
+                <td><input class="form-control" type="number" min="0" max="6" [(ngModel)]="attacker.cs"></td>
+                <td><input class="form-control" type="number" min="0" max="6" [(ngModel)]="attacker.tc"></td>
+                <td style="max-width: 300px">
+                    <app-modifier-chip
+                        *ngFor="let ability of attacker.abilities"
+                        [ability]="ability"
+                        (remove)="removeAbility(attacker, ability)"
+                    ></app-modifier-chip>
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z" fill="#000"/>
+                            </svg>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                        <li *ngFor="let abilityOption of abilityOptions" >
+                            <a class="dropdown-item" [class.disabled]="disableAbilityOption(attacker, abilityOption)" href="#" (click)="addAbility(attacker, abilityOption)">{{abilityOption.name}}</a>
+                        </li>
+                        </ul>
+                    </div>
+                </td>
+                <td>
+                    <select class="form-select" [(ngModel)]="attacker.facing">
+                        <option [ngValue]="'front'">Front</option>
+                        <option [ngValue]="'flank'">Flank</option>
+                        <option [ngValue]="'rear'">Rear</option>
+                    </select>
+                </td>
+                <td>
+                    <button class="btn btn-secondary" (click)="duplicateAttacker(index)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z" fill="#000"/>
+                        </svg>
+                    </button>
+                    <button class="btn btn-secondary" (click)="removeAttacker(index)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                        </svg>
+                    </button>
+                </td>
+            </tr>
+            
+            <tr>
+                <td colspan="8">
+                    <button class="btn btn-secondary" (click)="addAttacker()">Add attacker</button>
+                </td>
+            </tr>
+        </tbody>
     </table>
 </span>
 
 <span>
-    <table class="inputs-table">
-        <tr>
-            <td>Defender</td>
-            <td>De</td>
-            <td>Ne</td>
-        </tr>
-        <tr>
-            <td><input type="text" placeholder="Defender"></td>
-            <td><input type="number" min="2" max="6" [(ngModel)]="charge.defender.defense"></td>
-            <td>
-                <input type="number" min="0" max="99" [(ngModel)]="charge.defender.nerve.waver">
-                /
-                <input type="number" min="1" max="99" [(ngModel)]="charge.defender.nerve.rout">
-            </td>
-        </tr>
+    <table class="table table-striped inputs-table">
+        <thead>
+            <tr>
+                <td>Defender</td>
+                <td>De</td>
+                <td>Ne</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input class="form-control" type="text" placeholder="Defender"></td>
+                <td><input class="form-control" type="number" min="2" max="6" [(ngModel)]="charge.defender.defense"></td>
+                <td>
+                    <div class="nerve-input">
+                        <input class="form-control" type="number" min="0" max="99" [(ngModel)]="charge.defender.nerve.waver">
+                        /
+                        <input class="form-control" type="number" min="1" max="99" [(ngModel)]="charge.defender.nerve.rout">
+                    </div>
+                </td>
+            </tr>
+        </tbody>
     </table>
 </span>

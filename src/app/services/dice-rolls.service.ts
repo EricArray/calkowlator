@@ -255,21 +255,59 @@ export class DiceRollsService {
     return differenceTable
   }
 
-  nerveTest(woundsTable: Map<number, MathType>, defender: Defender): NerveTest {
+  nerveTest(woundsTable: Map<number, MathType>, defender: Defender, nerveModifiers: { dice?: number; plus?: number }[]): NerveTest {
     const nerveTest = <NerveTest>{
       steady: fraction(0),
       waver: fraction(0),
       rout: fraction(0),
     }
 
+    // todo: implement brutal dice
+    const nerveModificationTable: Map<number, MathType> = this.combineNerveModifiers(nerveModifiers)
+
     for (const [wounds, woundsProbability] of woundsTable) {
-      const { steady, waver, rout } = this.nerveTestWithWounds(wounds, defender)
-      nerveTest.steady = add(nerveTest.steady, multiply(woundsProbability, steady))
-      nerveTest.waver = add(nerveTest.waver, multiply(woundsProbability, waver))
-      nerveTest.rout = add(nerveTest.rout, multiply(woundsProbability, rout))
+      for (const [nerveModification, nerveModificationProbability] of nerveModificationTable) {
+        const { steady, waver, rout } = this.nerveTestWithWounds(wounds + nerveModification, defender)
+        nerveTest.steady = add(nerveTest.steady, multiply(multiply(woundsProbability, nerveModificationProbability), steady))
+        nerveTest.waver = add(nerveTest.waver, multiply(multiply(woundsProbability, nerveModificationProbability), waver))
+        nerveTest.rout = add(nerveTest.rout, multiply(multiply(woundsProbability, nerveModificationProbability), rout))
+      }
     }
 
     return nerveTest
+  }
+
+  private combineNerveModifiers(nerveModifiers: { dice?: number; plus?: number }[]): Map<number, MathType> {
+    if (nerveModifiers.length === 0) {
+      return new Map([[0, fraction(1)]])
+    }
+
+    const tables = nerveModifiers.map(nerveModifier => this.nerveModifierToTable(nerveModifier))
+    let accumTable = tables[0]
+    for (const otherTable of tables.slice(1)) {
+      const newTable = new Map<number, MathType>()
+      for (const [nerveA, probA] of accumTable) {
+        for (const [nerveB, probB] of otherTable) {
+          const prob = multiply(probA, probB)
+          const nerve = max(nerveA, nerveB)
+          newTable.set(nerve, prob)
+        }
+      }
+      accumTable = newTable
+    }
+    return accumTable
+  }
+
+  private nerveModifierToTable(nerveModifier: { dice?: number; plus?: number }): Map<number, MathType> {
+    if (nerveModifier.dice) {
+      const table = new Map<number, MathType>()
+      for (const diceResult of fromTo(1, nerveModifier.dice)) {
+        table.set(diceResult + (nerveModifier.plus ?? 0), fraction(1, nerveModifier.dice))
+      }
+      return table
+    } else {
+      return new Map([[nerveModifier.plus ?? 0, fraction(1)]])
+    }
   }
 
   private nerveTestWithWounds(wounds: number, defender: Defender): NerveTest {

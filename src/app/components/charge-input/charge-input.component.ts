@@ -46,7 +46,7 @@ export class ChargeInputComponent  {
     new Vicious(),
     // new Reroll(),
     new Blast(),
-    // new Brutal(),
+    new Brutal(),
   ]
 
   loadAttackerFactions: { factionName: string; units: Attacker[] }[] = [
@@ -140,7 +140,9 @@ export class ChargeInputComponent  {
             'to-hit': [],
             'to-wound': [],
           },
-          abilities: [],
+          abilities: [
+            new Brutal({ plus: 1 }),
+          ],
           facing: 'front'
         },
       ]

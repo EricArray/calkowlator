@@ -62,7 +62,7 @@ export class Blast extends Ability {
         }
     }
     clone(): Ability {
-        return new Blast(this.value)
+        return new Blast({ ... this.value })
     }
 }
 
@@ -75,7 +75,7 @@ export class Brutal extends Ability {
         }
     }
     clone(): Ability {
-        return new Brutal(this.value)
+        return new Brutal({ ... this.value })
     }
 }
 

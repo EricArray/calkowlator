@@ -92,7 +92,8 @@ export class AppComponent {
         const hitsTable = this.diceRollsService.combineTables(hitsTables)
         const woundsTable = this.diceRollsService.combineTables(woundsTables)
         
-        const nerveTest = this.diceRollsService.nerveTest(woundsTable, charge.defender)
+        const nerveModifiers = modifiedAttackers.map(attacker => attacker.brutal).filter(brutal => !!brutal) as any[]
+        const nerveTest = this.diceRollsService.nerveTest(woundsTable, charge.defender, nerveModifiers)
 
         return <ChargeResult>{
           charge,

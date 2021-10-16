@@ -37,7 +37,8 @@ export class ChargeInputComponent  {
       nerve: {
         waver: 15,
         rout: 17,
-      }
+      },
+      inspired: true,
     },
   }
 
@@ -159,7 +160,8 @@ export class ChargeInputComponent  {
           nerve: {
             waver: 12,
             rout: 14,
-          }
+          },
+          inspired: true,
         },
         {
           name: 'Big Rock Thrower',
@@ -167,7 +169,8 @@ export class ChargeInputComponent  {
           nerve: {
             waver: 9,
             rout: 11,
-          }
+          },
+          inspired: true,
         },
       ]
     },
@@ -180,7 +183,17 @@ export class ChargeInputComponent  {
           nerve: {
             waver: 10,
             rout: 12,
-          }
+          },
+          inspired: true,
+        },
+        {
+          name: 'Gargoyles',
+          defense: 3,
+          nerve: {
+            waver: 8,
+            rout: 10,
+          },
+          inspired: true,
         },
       ]
     },
@@ -193,7 +206,8 @@ export class ChargeInputComponent  {
           nerve: {
             waver: 15,
             rout: 17,
-          }
+          },
+          inspired: true,
         },
       ]
     },

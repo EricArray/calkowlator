@@ -14,7 +14,7 @@
 }
 
 .btn-remove-ability {
-    display: none;
+    /* display: none; */
 }
 
 :host:hover .btn-remove-ability {

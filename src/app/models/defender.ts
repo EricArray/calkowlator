@@ -5,6 +5,7 @@ export interface Defender {
     waver: number | 'fearless';
     rout: number;
   };
+  inspired: boolean;
   wasLoaded?: boolean;
 }
 

@@ -266,11 +266,16 @@ export class DiceRollsService {
     const nerveModificationTable: Map<number, MathType> = this.combineNerveModifiers(nerveModifiers)
 
     for (const [wounds, woundsProbability] of woundsTable) {
-      for (const [nerveModification, nerveModificationProbability] of nerveModificationTable) {
-        const { steady, waver, rout } = this.nerveTestWithWounds(wounds + nerveModification, defender)
-        nerveTest.steady = add(nerveTest.steady, multiply(multiply(woundsProbability, nerveModificationProbability), steady))
-        nerveTest.waver = add(nerveTest.waver, multiply(multiply(woundsProbability, nerveModificationProbability), waver))
-        nerveTest.rout = add(nerveTest.rout, multiply(multiply(woundsProbability, nerveModificationProbability), rout))
+      // no nerve test if no wounds
+      if (wounds === 0) {
+        nerveTest.steady = add(nerveTest.steady, woundsProbability)
+      } else {
+        for (const [nerveModification, nerveModificationProbability] of nerveModificationTable) {
+          const { steady, waver, rout } = this.nerveTestWithWounds(wounds + nerveModification, defender)
+          nerveTest.steady = add(nerveTest.steady, multiply(multiply(woundsProbability, nerveModificationProbability), steady))
+          nerveTest.waver = add(nerveTest.waver, multiply(multiply(woundsProbability, nerveModificationProbability), waver))
+          nerveTest.rout = add(nerveTest.rout, multiply(multiply(woundsProbability, nerveModificationProbability), rout))
+        }
       }
     }
 
@@ -326,13 +331,25 @@ export class DiceRollsService {
     }
 
     for (const [sum2d6, sum2d6probability] of sumTable2d6.entries()) {
-      if (sum2d6 >= toRout) {
+      // double 1 is always steady
+      // double 6 is waver if it didn't rout and if not fearless
+
+      if (sum2d6 === 2) {
+        nerve.steady = add(nerve.steady, sum2d6probability)
+      } else if (sum2d6 >= toRout) {
         nerve.rout = add(nerve.rout, sum2d6probability)
       } else if (toWaver !== 'fearless' && (sum2d6 >= toWaver || sum2d6 === 12)) {
         nerve.waver = add(nerve.waver, sum2d6probability)
       } else {
         nerve.steady = add(nerve.steady, sum2d6probability)
       }
+    }
+
+    if (defender.inspired) {
+      // reroll on 'rout'
+      nerve.steady = add(nerve.steady, multiply(nerve.rout, nerve.steady))
+      nerve.waver = add(nerve.waver, multiply(nerve.rout, nerve.waver))
+      nerve.rout = multiply(nerve.rout, nerve.rout)
     }
 
     return nerve

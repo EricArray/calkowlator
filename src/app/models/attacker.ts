@@ -26,3 +26,10 @@ export interface Attacker {
   abilities: Ability[];
   facing: 'front' | 'flank' | 'rear';
 }
+
+export function cloneAttacker(originalAttacker: Attacker): Attacker {
+  return {
+    ...originalAttacker,
+    abilities: originalAttacker.abilities.map(ability => ability.clone()),
+  }
+}

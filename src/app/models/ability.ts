@@ -13,6 +13,7 @@ export abstract class Ability {
     ) {}
 
     abstract applyModification(attacker: Attacker, defender: Defender): Attacker
+    abstract clone(): Ability
 }
 
 export class Elite extends Ability {
@@ -23,6 +24,9 @@ export class Elite extends Ability {
             elite: true,
         }
     }
+    clone(): Ability {
+        return new Elite()
+    }
 }
 
 export class Vicious extends Ability {
@@ -32,6 +36,9 @@ export class Vicious extends Ability {
             ...attacker,
             vicious: true,
         }
+    }
+    clone(): Ability {
+        return new Vicious()
     }
 }
 
@@ -48,22 +55,28 @@ export class Vicious extends Ability {
 // }
 
 export class Blast extends Ability {
-    constructor() { super('Blast', 'dice-plus-number', {}); }
+    constructor(value = {}) { super('Blast', 'dice-plus-number', value); }
     applyModification(attacker: Attacker, defender: Defender): Attacker {
         return {
             ...attacker,
             blast: this.value,
         }
     }
+    clone(): Ability {
+        return new Blast(this.value)
+    }
 }
 
 export class Brutal extends Ability {
-    constructor() { super('Brutal', 'dice-plus-number', {}); }
+    constructor(value = {}) { super('Brutal', 'dice-plus-number', value); }
     applyModification(attacker: Attacker, defender: Defender): Attacker {
         return {
             ...attacker,
             brutal: this.value,
         }
+    }
+    clone(): Ability {
+        return new Brutal(this.value)
     }
 }
 

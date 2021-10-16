@@ -137,7 +137,7 @@ export class ChargeOutputComponent implements AfterViewInit, OnChanges {
   private buildNerveTestData(): ChartData {
     const labels = ['Steady', 'Waver', 'Rout']
 
-    const COLORS = ['red', 'green', 'blue']
+    const COLORS = ['blue', 'green', 'red']
     const datasets = this.results.map((chargeResult, index) => ({
       label: "Charge #" + (index + 1),
       data: [

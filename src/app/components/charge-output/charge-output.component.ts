@@ -10,11 +10,13 @@ import { fromZeroTo } from '@app/util';
   styleUrls: ['./charge-output.component.css']
 })
 export class ChargeOutputComponent implements AfterViewInit, OnChanges {
+  @ViewChild('hitsChart') hitsChartComponent?: ElementRef<HTMLCanvasElement>
   @ViewChild('woundsChart') woundsChartComponent?: ElementRef<HTMLCanvasElement>
   @ViewChild('nerveTestChart') nerveTestChartComponent?: ElementRef<HTMLCanvasElement>
 
   @Input() results: ChargeResult[] = [];
 
+  hitsChart?: Chart
   woundsChart?: Chart
   nerveTestChart?: Chart
 
@@ -22,6 +24,7 @@ export class ChargeOutputComponent implements AfterViewInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.results) {
+      this.updateHitsChart()
       this.updateWoundsChart()
       this.updateNerveTestChart()
     }
@@ -30,8 +33,42 @@ export class ChargeOutputComponent implements AfterViewInit, OnChanges {
   ngAfterViewInit(): void {
     Chart.register(...registerables as any);
 
+    this.setupHitsChart()
     this.setupWoundsChart()
     this.setupNerveTestChart()
+  }
+
+  private setupHitsChart(): void {
+    if (this.hitsChartComponent) {
+      var ctx = this.hitsChartComponent.nativeElement.getContext('2d');
+      
+      this.hitsChart = new Chart(ctx!, {
+        type: 'line',
+        data: this.buildHitsData(),
+        options: {
+          responsive: true,
+          interaction: {
+            mode: 'index',
+            intersect: false,
+          },
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            title: {
+              display: true,
+              text: 'Hits'
+            },
+            tooltip: {
+              position: 'nearest',
+              callbacks: {
+                label: (context: any) => context.dataset.label + ': ' + format(context.raw * 100, 3) + ' %'
+              }
+            },
+          }
+        },
+      });
+    }
   }
 
   private setupWoundsChart(): void {
@@ -58,7 +95,7 @@ export class ChargeOutputComponent implements AfterViewInit, OnChanges {
             tooltip: {
               position: 'nearest',
               callbacks: {
-                label: (context: any) => context.dataset.label + ': ' + format(context.raw * 100, 2) + ' %'
+                label: (context: any) => context.dataset.label + ': ' + format(context.raw * 100, 3) + ' %'
               }
             },
           }
@@ -87,13 +124,20 @@ export class ChargeOutputComponent implements AfterViewInit, OnChanges {
             tooltip: {
               mode: "index",
               callbacks: {
-                label: (context: any) => context.dataset.label + ': ' + format(context.raw * 100, 2) + ' %',
+                label: (context: any) => context.dataset.label + ': ' + format(context.raw * 100, 3) + ' %',
                 title: (context: any) => context[0].label,
               }
             },
           }
         },
       });
+    }
+  }
+
+  private updateHitsChart(): void {
+    if (this.hitsChart) {
+      this.hitsChart.data = this.buildHitsData()
+      this.hitsChart.update()
     }
   }
 
@@ -108,6 +152,29 @@ export class ChargeOutputComponent implements AfterViewInit, OnChanges {
     if (this.nerveTestChart) {
       this.nerveTestChart.data = this.buildNerveTestData()
       this.nerveTestChart.update()
+    }
+  }
+
+  private buildHitsData(): ChartData {
+    const COLORS = ['red', 'green', 'blue']
+    const topHits = max(
+      0,
+      ...this.results.map(chargeResult => max(0, ...chargeResult.hitsTable.keys()))
+    )
+    const labels = fromZeroTo(topHits)
+
+    const datasets = this.results.map((chargeResult, index) => ({
+      label: 'Charge #' + (index + 1),
+      borderColor: COLORS[index],
+      backgroundColor: COLORS[index],
+      data: labels.map(label => chargeResult.hitsTable.get(label)
+        ? number(chargeResult.hitsTable.get(label)) as number
+        : null)
+    }))
+
+    return {
+      labels,
+      datasets,
     }
   }
 

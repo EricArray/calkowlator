@@ -1,6 +1,5 @@
 import { Attacker } from "./attacker";
 import { Defender } from "./defender";
-import { RerollFunction } from "./reroll-function";
 
 export abstract class Ability {
     constructor(

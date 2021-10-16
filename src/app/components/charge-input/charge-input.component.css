@@ -13,3 +13,7 @@
     flex-direction: row;
     align-items: center;
 }
+
+.was-loaded input.ng-pristine {
+    background-color: beige;
+}

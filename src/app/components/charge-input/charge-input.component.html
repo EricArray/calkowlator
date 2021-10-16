@@ -1,5 +1,5 @@
 <span>
-    <table class="table table-striped  inputs-table">
+    <table class="table table-striped inputs-table">
         <thead>
             <tr>
                 <td>Attacker</td>
@@ -13,9 +13,9 @@
         </thead>
 
         <tbody>
-            <tr *ngFor="let attacker of charge.attackers; let index = index">
+            <tr *ngFor="let attacker of charge.attackers; let index = index" [class.was-loaded]="attacker.wasLoaded">
                 <td><input class="form-control" type="text" placeholder="Attacker #{{ index + 1 }}" [(ngModel)]="attacker.name"></td>
-                <td><input class="form-control" type="number" min="2" max="6" [(ngModel)]="attacker.melee"></td>
+                <td><input class="form-control"  type="number" min="2" max="6" [(ngModel)]="attacker.melee"></td>
                 <td><input class="form-control" type="number" min="0" max="100" [(ngModel)]="attacker.attack"></td>
                 <td><input class="form-control" type="number" min="0" max="6" [(ngModel)]="attacker.cs"></td>
                 <td><input class="form-control" type="number" min="0" max="6" [(ngModel)]="attacker.tc"></td>
@@ -107,14 +107,41 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td><input class="form-control" type="text" placeholder="Defender"></td>
+            <tr *ngFor="let defender of [charge.defender]" [class.was-loaded]="charge.defender.wasLoaded">
+                <td><input class="form-control" type="text" placeholder="Defender" [(ngModel)]="charge.defender.name"></td>
                 <td><input class="form-control" type="number" min="2" max="6" [(ngModel)]="charge.defender.defense"></td>
                 <td>
                     <div class="nerve-input">
                         <input class="form-control" type="number" min="0" max="99" [(ngModel)]="charge.defender.nerve.waver">
                         /
                         <input class="form-control" type="number" min="1" max="99" [(ngModel)]="charge.defender.nerve.rout">
+                    </div>
+                </td>
+            </tr>
+            
+            <tr>
+                <td colspan="3">
+                    <div style="display: flex; flex-direction: row;">
+                        <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-down" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M3.5 10a.5.5 0 0 1-.5-.5v-8a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 0 0 1h2A1.5 1.5 0 0 0 14 9.5v-8A1.5 1.5 0 0 0 12.5 0h-9A1.5 1.5 0 0 0 2 1.5v8A1.5 1.5 0 0 0 3.5 11h2a.5.5 0 0 0 0-1h-2z"/>
+                                    <path fill-rule="evenodd" d="M7.646 15.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 14.293V5.5a.5.5 0 0 0-1 0v8.793l-2.146-2.147a.5.5 0 0 0-.708.708l3 3z"/>
+                                </svg>
+                                Load defender
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                <ng-container *ngFor="let loadDefenderFaction of loadDefenderFactions; let first = first" >
+                                    <li *ngIf="!first"><hr class="dropdown-divider"></li>
+
+                                    <li><h6 class="dropdown-header">{{ loadDefenderFaction.factionName }}</h6></li>
+
+                                    <li *ngFor="let loadDefenderOption of loadDefenderFaction.units">
+                                        <a class="dropdown-item" href="#" (click)="loadDefender(loadDefenderOption)">{{ loadDefenderOption.name }}</a>
+                                    </li>
+                                </ng-container>
+                            </ul>
+                        </div>
                     </div>
                 </td>
             </tr>

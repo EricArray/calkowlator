@@ -3,6 +3,7 @@ import { Ability } from "./ability";
 import { RerollFunction } from "./reroll-function";
 
 export interface Attacker {
+  wasLoaded?: boolean;
   name?: string;
   active: boolean;
   melee: Melee;

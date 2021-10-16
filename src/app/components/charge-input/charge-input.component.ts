@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Ability, Blast, Brutal, Elite, Vicious } from '@models/ability';
 import { Attacker, cloneAttacker } from '@models/attacker';
-import { Defender } from '@models/defender';
+import { cloneDefender, Defender } from '@models/defender';
 
 function defaultAttacker(): Attacker {
   return {
@@ -147,6 +147,55 @@ export class ChargeInputComponent  {
     } 
   ]
 
+  loadDefenderFactions: { factionName: string; units: Defender[] }[] = [
+    {
+      factionName: 'Goblins',
+      units: [
+        {
+          name: 'Rabble',
+          defense: 4,
+          nerve: {
+            waver: 12,
+            rout: 14,
+          }
+        },
+        {
+          name: 'Big Rock Thrower',
+          defense: 4,
+          nerve: {
+            waver: 9,
+            rout: 11,
+          }
+        },
+      ]
+    },
+    {
+      factionName: 'Abyssal Dwarfs',
+      units: [
+        {
+          name: 'Grog Mortar',
+          defense: 5,
+          nerve: {
+            waver: 10,
+            rout: 12,
+          }
+        },
+      ]
+    },
+    {
+      factionName: 'Ogres',
+      units: [
+        {
+          name: 'Warriors',
+          defense: 5,
+          nerve: {
+            waver: 15,
+            rout: 17,
+          }
+        },
+      ]
+    },
+  ]
   constructor() { }
 
   addAttacker(): void {
@@ -168,6 +217,7 @@ export class ChargeInputComponent  {
 
   loadAttacker(loadAttackerOption: Attacker): void {
     const newAttacker = cloneAttacker(loadAttackerOption)
+    newAttacker.wasLoaded = true;
     this.charge.attackers = [
       ...this.charge.attackers,
       newAttacker,
@@ -185,6 +235,11 @@ export class ChargeInputComponent  {
 
   disableAbilityOption(attacker: Attacker, abilityOption: any): boolean {
     return attacker.abilities.some(ability => ability.name === abilityOption.name)
+  }
+
+  loadDefender(defender: Defender): void {
+    this.charge.defender = cloneDefender(defender)
+    this.charge.defender.wasLoaded = true
   }
 
 }

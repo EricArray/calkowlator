@@ -85,8 +85,10 @@ export class ChargeOutputComponent implements AfterViewInit, OnChanges {
               text: 'Nerve Test'
             },
             tooltip: {
+              mode: "index",
               callbacks: {
-                label: (context: any) => context.label + ': ' + format(context.raw * 100, 2) + ' %'
+                label: (context: any) => context.dataset.label + ': ' + format(context.raw * 100, 2) + ' %',
+                title: (context: any) => context[0].label,
               }
             },
           }
@@ -136,18 +138,15 @@ export class ChargeOutputComponent implements AfterViewInit, OnChanges {
     const labels = ['Steady', 'Waver', 'Rout']
 
     const COLORS = ['red', 'green', 'blue']
-    const nerveTest = this.results[0].nerveTest
-    const datasets = [
-      {
-        label: 'Nerve Test',
-        data: [
-          number(nerveTest.steady as any) as number,
-          number(nerveTest.waver as any) as number,
-          number(nerveTest.rout as any) as number,
-        ],
-        backgroundColor: COLORS,
-      }
-    ]
+    const datasets = this.results.map((chargeResult, index) => ({
+      label: "Charge #" + (index + 1),
+      data: [
+        number(chargeResult.nerveTest.steady as any) as number,
+        number(chargeResult.nerveTest.waver as any) as number,
+        number(chargeResult.nerveTest.rout as any) as number,
+      ],
+      backgroundColor: COLORS,
+    }))
 
     return {
       labels,

@@ -4,5 +4,27 @@
     border-radius: 50px;
     padding-left: 10px;
     padding-right: 10px;
-    display: inline-block;
+    display: flex;
+    align-items: center;
+    width: min-content;
+}
+
+:host:hover {
+    background-color: rgb(185, 240, 185);
+}
+
+.btn-remove-ability {
+    display: none;
+}
+
+:host:hover .btn-remove-ability {
+    display: block;
+}
+
+.form-select {
+    width: 70px;
+}
+
+.form-control {
+    width: 3.5em;
 }

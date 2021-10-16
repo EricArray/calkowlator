@@ -213,6 +213,9 @@ export class ChargeInputComponent  {
 
   removeAttacker(removeIndex: number): void {
     this.charge.attackers = this.charge.attackers.filter((attacker, index) => index !== removeIndex)
+    if (this.charge.attackers.length === 0) {
+      this.addAttacker()
+    }
   }
 
   loadAttacker(loadAttackerOption: Attacker): void {

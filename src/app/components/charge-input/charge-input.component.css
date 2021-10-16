@@ -3,10 +3,17 @@
     flex-direction: row;
 }
 
-.inputs-table input[type="number"] {
-    width: 70px;
+.form-control {
+    width: 3.75em;
 }
 
+.form-control[type="text"] {
+    width: 12em;
+}
+
+.form-control.two-digits {
+    width: 4.25em;
+}
 
 .nerve-input {
     display: flex;

@@ -319,6 +319,8 @@ export class DiceRollsService {
     const sumTable2d6 = this.getDiceSumTable(2, 6)
 
     const toRout = defender.nerve.rout - wounds
+
+    // TODO || !defender.nerve.waver
     const toWaver =
       defender.nerve.waver === 'fearless' || defender.nerve.waver === 0
         ? 'fearless'

@@ -1,5 +1,6 @@
 import { Melee } from "../services/dice-rolls.service";
 import { Ability } from "./ability";
+import { DicePlusNumber } from "./dice-plus-number";
 import { RerollFunction } from "./reroll-function";
 
 export interface Attacker {
@@ -16,14 +17,8 @@ export interface Attacker {
     'to-hit': RerollFunction[];
     'to-wound': RerollFunction[];
   }
-  blast?: {
-    dice?: 3 | 6;
-    plus?: number;
-  }
-  brutal?: {
-    dice?: 3 | 6;
-    plus?: number;
-  }
+  blast?: DicePlusNumber;
+  brutal?: DicePlusNumber;
   abilities: Ability[];
   facing: 'front' | 'flank' | 'rear';
 }

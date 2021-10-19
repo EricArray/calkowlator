@@ -1,7 +1,15 @@
 <div class="container">
     <div>
         <canvas #hitsChart style="max-width: 500px; max-height: 250px;" width="500" height="250"></canvas>
+        <p *ngFor="let hitsAverage of hitsAverages">
+            {{ hitsAverage.chargeName }} average: {{ hitsAverage.average }} hits
+        </p>
     </div>
-    <div><canvas #woundsChart style="max-width: 500px; max-height: 250px;" width="500" height="250"></canvas></div>
+    <div>
+        <canvas #woundsChart style="max-width: 500px; max-height: 250px;" width="500" height="250"></canvas>
+        <p *ngFor="let woundsAverage of woundsAverages">
+            {{ woundsAverage.chargeName }} average: {{ woundsAverage.average }} wounds
+        </p>
+    </div>
     <div><canvas #nerveTestChart style="max-width: 250px; max-height: 250px" width="250" height="250"></canvas></div>
 </div>

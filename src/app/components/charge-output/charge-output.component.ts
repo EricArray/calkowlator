@@ -1,6 +1,6 @@
 import { AfterViewChecked, AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { Chart, ChartData, LineController, registerables } from 'chart.js';
-import { format, max, number } from 'mathjs';
+import { add, format, fraction, MathType, max, multiply, number } from 'mathjs';
 import { ChargeResult } from '@models/charge-result';
 import { fromZeroTo } from '@app/util';
 
@@ -20,6 +20,9 @@ export class ChargeOutputComponent implements AfterViewInit, OnChanges {
   woundsChart?: Chart
   nerveTestChart?: Chart
 
+  hitsAverages:  { chargeName: string; average: string }[] = []
+  woundsAverages:  { chargeName: string; average: string }[] = []
+  
   constructor() { }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -156,6 +159,11 @@ export class ChargeOutputComponent implements AfterViewInit, OnChanges {
   }
 
   private buildHitsData(): ChartData {
+    this.hitsAverages = this.results.map((chargeResult, index) => ({
+      chargeName: 'Charge #' + (index + 1),
+      average: format(this.getTableAverage(chargeResult.hitsTable), 2)
+    }))
+
     const COLORS = ['red', 'green', 'blue']
     const topHits = max(
       0,
@@ -179,6 +187,12 @@ export class ChargeOutputComponent implements AfterViewInit, OnChanges {
   }
 
   private buildWoundsData(): ChartData {
+    this.woundsAverages = this.results.map((chargeResult, index) => ({
+      chargeName: 'Charge #' + (index + 1),
+      average: format(this.getTableAverage(chargeResult.woundsTable), 2)
+    }))
+
+
     const COLORS = ['red', 'green', 'blue']
     const topWounds = max(
       0,
@@ -219,6 +233,12 @@ export class ChargeOutputComponent implements AfterViewInit, OnChanges {
       labels,
       datasets,
     }
+  }
+
+  private getTableAverage(table: Map<number, MathType>): number {
+    return number([...table.entries()]
+      .map(([hits, probability]) => multiply(hits, probability))
+      .reduce((a, b) => add(a, b), fraction(0)) as any) as number
   }
 
 }

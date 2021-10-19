@@ -42,10 +42,11 @@ export class Vicious extends Ability {
     clone(): Ability {
         return new Vicious()
     }
+    incompatibleAbilityTypes() { return [RerollToWound] }
 }
 
 export class RerollToHit extends Ability {
-    constructor(value = {}) { super('Reroll to hit', 'dice-plus-number', value) }
+    constructor(value = {}) { super('Reroll to Hit', 'dice-plus-number', value) }
     get stackable(): boolean { return true }
     applyModification(attacker: Attacker, defender: Defender): Attacker {
         return {
@@ -65,17 +66,26 @@ export class RerollToHit extends Ability {
     incompatibleAbilityTypes() { return [Elite] }
 }
 
-// export class Reroll extends Ability {
-//     constructor() { super('Reroll', 'reroll', {}); }
-//     applyModification(attacker: Attacker, defender: Defender): Attacker {
-//         if (this.value.when === 'to-hit') {
-//             return {
-//                 ...attacker,
-//                 rerollFunctionsToHit: [...attacker.rerollFunctionsToHit, ]
-//             }
-//         }
-//     }
-// }
+export class RerollToWound extends Ability {
+    constructor(value = {}) { super('Reroll to Wound', 'dice-plus-number', value) }
+    get stackable(): boolean { return true }
+    applyModification(attacker: Attacker, defender: Defender): Attacker {
+        return {
+            ...attacker,
+            rerollToWoundList: [
+                ...attacker.rerollToWoundList,
+                {
+                    amount: this.value,
+                    onlyOnes: false,
+                }
+            ]
+        }
+    }
+    clone(): Ability {
+        return new RerollToWound(this.value)
+    }
+    incompatibleAbilityTypes() { return [Vicious] }
+}
 
 export class Blast extends Ability {
     constructor(value = {}) { super('Blast', 'dice-plus-number', value) }

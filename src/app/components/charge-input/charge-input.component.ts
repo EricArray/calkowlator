@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Ability, Blast, Brutal, Elite,  RerollToHit,  Vicious } from '@models/ability';
+import { Ability, Blast, Brutal, Elite,  RerollToHit,  RerollToWound,  Vicious } from '@models/ability';
 import { Attacker, cloneAttacker } from '@models/attacker';
 import { cloneDefender, Defender } from '@models/defender';
 
@@ -42,8 +42,9 @@ export class ChargeInputComponent  {
 
   abilityOptions: Ability[] = [
     new Elite(),
-    new RerollToHit(),
     new Vicious(),
+    new RerollToHit(),
+    new RerollToWound(),
     new Blast(),
     new Brutal(),
   ]

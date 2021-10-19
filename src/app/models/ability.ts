@@ -11,12 +11,14 @@ export abstract class Ability {
         public value: any,
     ) {}
 
+    get stackable(): boolean { return false }
     abstract applyModification(attacker: Attacker, defender: Defender): Attacker
     abstract clone(): Ability
+    incompatibleAbilityTypes(): (typeof Ability)[] { return [] }
 }
 
 export class Elite extends Ability {
-    constructor() { super('Elite', 'no-value', undefined); }
+    constructor() { super('Elite', 'no-value', undefined) }
     applyModification(attacker: Attacker, defender: Defender): Attacker {
         return {
             ...attacker,
@@ -26,10 +28,11 @@ export class Elite extends Ability {
     clone(): Ability {
         return new Elite()
     }
+    incompatibleAbilityTypes() { return [RerollToHit] }
 }
 
 export class Vicious extends Ability {
-    constructor() { super('Vicious', 'no-value', undefined); }
+    constructor() { super('Vicious', 'no-value', undefined) }
     applyModification(attacker: Attacker, defender: Defender): Attacker {
         return {
             ...attacker,
@@ -39,6 +42,27 @@ export class Vicious extends Ability {
     clone(): Ability {
         return new Vicious()
     }
+}
+
+export class RerollToHit extends Ability {
+    constructor(value = {}) { super('Reroll to hit', 'dice-plus-number', value) }
+    get stackable(): boolean { return true }
+    applyModification(attacker: Attacker, defender: Defender): Attacker {
+        return {
+            ...attacker,
+            rerollToHitList: [
+                ...attacker.rerollToHitList,
+                {
+                    amount: this.value,
+                    onlyOnes: false,
+                }
+            ]
+        }
+    }
+    clone(): Ability {
+        return new RerollToHit(this.value)
+    }
+    incompatibleAbilityTypes() { return [Elite] }
 }
 
 // export class Reroll extends Ability {
@@ -54,7 +78,7 @@ export class Vicious extends Ability {
 // }
 
 export class Blast extends Ability {
-    constructor(value = {}) { super('Blast', 'dice-plus-number', value); }
+    constructor(value = {}) { super('Blast', 'dice-plus-number', value) }
     applyModification(attacker: Attacker, defender: Defender): Attacker {
         return {
             ...attacker,
@@ -67,7 +91,7 @@ export class Blast extends Ability {
 }
 
 export class Brutal extends Ability {
-    constructor(value = {}) { super('Brutal', 'dice-plus-number', value); }
+    constructor(value = {}) { super('Brutal', 'dice-plus-number', value) }
     applyModification(attacker: Attacker, defender: Defender): Attacker {
         return {
             ...attacker,

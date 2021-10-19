@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { Ability, Blast, Brutal, Elite, Vicious } from '@models/ability';
+import { Component } from '@angular/core';
+import { Ability, Blast, Brutal, Elite,  RerollToHit,  Vicious } from '@models/ability';
 import { Attacker, cloneAttacker } from '@models/attacker';
 import { cloneDefender, Defender } from '@models/defender';
 
@@ -12,10 +12,8 @@ function defaultAttacker(): Attacker {
     vicious: false,
     facing: 'front',
     abilities: [],
-    rerolls: {
-      "to-hit": [],
-      "to-wound": [],
-    },
+    rerollToHitList: [],
+    rerollToWoundList: [],
   }
 }
 
@@ -27,7 +25,7 @@ export interface Charge {
 @Component({
   selector: 'app-charge-input',
   templateUrl: './charge-input.component.html',
-  styleUrls: ['./charge-input.component.css']
+  styleUrls: ['./charge-input.component.css'],
 })
 export class ChargeInputComponent  {
   charge: Charge = {
@@ -44,8 +42,8 @@ export class ChargeInputComponent  {
 
   abilityOptions: Ability[] = [
     new Elite(),
+    new RerollToHit(),
     new Vicious(),
-    // new Reroll(),
     new Blast(),
     new Brutal(),
   ]
@@ -61,10 +59,8 @@ export class ChargeInputComponent  {
           attack: 12,
           elite: false,
           vicious: false,
-          rerolls: {
-            'to-hit': [],
-            'to-wound': [],
-          },
+          rerollToHitList: [],
+          rerollToWoundList: [],
           abilities: [],
           facing: 'front'
         },
@@ -76,10 +72,8 @@ export class ChargeInputComponent  {
           cs: 1,
           elite: false,
           vicious: false,
-          rerolls: {
-            'to-hit': [],
-            'to-wound': [],
-          },
+          rerollToHitList: [],
+          rerollToWoundList: [],
           abilities: [],
           facing: 'front'
         },
@@ -91,10 +85,8 @@ export class ChargeInputComponent  {
           cs: 3,
           elite: true,
           vicious: false,
-          rerolls: {
-            'to-hit': [],
-            'to-wound': [],
-          },
+          rerollToHitList: [],
+          rerollToWoundList: [],
           abilities: [
             new Blast({ dice: 3, plus: 1 }),
             new Elite(),
@@ -114,10 +106,8 @@ export class ChargeInputComponent  {
           cs: 2,
           elite: false,
           vicious: true,
-          rerolls: {
-            'to-hit': [],
-            'to-wound': [],
-          },
+          rerollToHitList: [],
+          rerollToWoundList: [],
           abilities: [
             new Blast({ dice: 3, plus: 1 }),
             new Vicious(),
@@ -137,10 +127,8 @@ export class ChargeInputComponent  {
           cs: 1,
           elite: false,
           vicious: false,
-          rerolls: {
-            'to-hit': [],
-            'to-wound': [],
-          },
+          rerollToHitList: [],
+          rerollToWoundList: [],
           abilities: [
             new Brutal({ plus: 1 }),
           ],
@@ -252,8 +240,14 @@ export class ChargeInputComponent  {
     attacker.abilities = attacker.abilities.filter(ability => ability !== abilityToRemove)
   }
 
-  disableAbilityOption(attacker: Attacker, abilityOption: any): boolean {
-    return attacker.abilities.some(ability => ability.name === abilityOption.name)
+  disableAbilityOption(attacker: Attacker, abilityOption: Ability): boolean {
+    return !abilityOption.stackable && attacker.abilities.some(ability => ability.name === abilityOption.name)
+  }
+
+  incompatibleAbilityOption(attacker: Attacker, abilityOption: Ability): Ability | undefined {
+    return attacker.abilities.find(attackerAbility =>
+      abilityOption.incompatibleAbilityTypes().some(incompatibleAbilityTypes => attackerAbility instanceof incompatibleAbilityTypes)
+    )
   }
 
   loadDefender(defender: Defender): void {

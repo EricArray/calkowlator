@@ -1,7 +1,6 @@
 import { Melee } from "../services/dice-rolls.service";
 import { Ability } from "./ability";
 import { DicePlusNumber } from "./dice-plus-number";
-import { RerollFunction } from "./reroll-function";
 
 export interface Attacker {
   wasLoaded?: boolean;
@@ -13,10 +12,8 @@ export interface Attacker {
   tc?: number,
   elite: boolean;
   vicious: boolean;
-  rerolls: {
-    'to-hit': RerollFunction[];
-    'to-wound': RerollFunction[];
-  }
+  rerollToHitList: { amount: DicePlusNumber, onlyOnes: boolean }[];
+  rerollToWoundList: { amount: DicePlusNumber, onlyOnes: boolean }[];
   blast?: DicePlusNumber;
   brutal?: DicePlusNumber;
   abilities: Ability[];

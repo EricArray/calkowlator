@@ -67,7 +67,7 @@ export class AppComponent {
               attack: attacker.attack,
               melee: attacker.melee,
               elite: attacker.elite,
-              rerollFunctions: attacker.rerolls['to-hit'],
+              rerollList: attacker.rerollToHitList,
               blast: attacker.blast
             })
 
@@ -76,7 +76,7 @@ export class AppComponent {
               hitsTable,
               defense: modifiedDefense > 6 ? 6 : modifiedDefense < 2 ? 2 : modifiedDefense as any,
               vicious: attacker.vicious,
-              rerollFunctions: attacker.rerolls['to-wound'],
+              rerollList: attacker.rerollToWoundList,
             })
 
             return {

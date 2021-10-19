@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { FactionsService } from '@app/services/factions.service';
 import { Ability, BaneChanted, Blast, Brutal, Elite,  RerollToHit,  RerollToWound,  Vicious, Weakened } from '@models/ability';
 import { Attacker, cloneAttacker } from '@models/attacker';
 import { cloneDefender, Defender } from '@models/defender';
@@ -51,159 +52,10 @@ export class ChargeInputComponent  {
     new Weakened(),
   ]
 
-  loadAttackerFactions: { factionName: string; units: Attacker[] }[] = [
-    {
-      factionName: 'Goblins',
-      units: [
-        {
-          name: 'Rabble',
-          active: true,
-          melee: 5,
-          attack: 12,
-          elite: false,
-          vicious: false,
-          rerollToHitList: [],
-          rerollToWoundList: [],
-          abilities: [],
-          facing: 'front'
-        },
-        {
-          name: 'Mawpup',
-          active: true,
-          melee: 4,
-          attack: 6,
-          cs: 1,
-          elite: false,
-          vicious: false,
-          rerollToHitList: [],
-          rerollToWoundList: [],
-          abilities: [],
-          facing: 'front'
-        },
-        {
-          name: 'Big Rock Thrower + Elite',
-          active: true,
-          melee: 5,
-          attack: 2,
-          cs: 3,
-          elite: true,
-          vicious: false,
-          rerollToHitList: [],
-          rerollToWoundList: [],
-          abilities: [
-            new Blast({ dice: 3, plus: 1 }),
-            new Elite(),
-          ],
-          facing: 'front'
-        },
-      ]
-    },
-    {
-      factionName: 'Abyssal Dwarfs',
-      units: [
-        {
-          name: 'Grog Mortar',
-          active: true,
-          melee: 5,
-          attack: 2,
-          cs: 2,
-          elite: false,
-          vicious: true,
-          rerollToHitList: [],
-          rerollToWoundList: [],
-          abilities: [
-            new Blast({ dice: 3, plus: 1 }),
-            new Vicious(),
-          ],
-          facing: 'front'
-        },
-      ],
-    },
-    {
-      factionName: 'Ogres',
-      units: [
-        {
-          name: 'Warriors',
-          active: true,
-          melee: 3,
-          attack: 18,
-          cs: 1,
-          elite: false,
-          vicious: false,
-          rerollToHitList: [],
-          rerollToWoundList: [],
-          abilities: [
-            new Brutal({ plus: 1 }),
-          ],
-          facing: 'front'
-        },
-      ]
-    } 
-  ]
+  loadAttackerFactions = this.factionsService.loadAttackerFactions
+  loadDefenderFactions = this.factionsService.loadDefenderFactions
 
-  loadDefenderFactions: { factionName: string; units: Defender[] }[] = [
-    {
-      factionName: 'Goblins',
-      units: [
-        {
-          name: 'Rabble',
-          defense: 4,
-          nerve: {
-            waver: 12,
-            rout: 14,
-          },
-          inspired: true,
-        },
-        {
-          name: 'Big Rock Thrower',
-          defense: 4,
-          nerve: {
-            waver: 9,
-            rout: 11,
-          },
-          inspired: true,
-        },
-      ]
-    },
-    {
-      factionName: 'Abyssal Dwarfs',
-      units: [
-        {
-          name: 'Grog Mortar',
-          defense: 5,
-          nerve: {
-            waver: 10,
-            rout: 12,
-          },
-          inspired: true,
-        },
-        {
-          name: 'Gargoyles',
-          defense: 3,
-          nerve: {
-            waver: 8,
-            rout: 10,
-          },
-          inspired: true,
-        },
-      ]
-    },
-    {
-      factionName: 'Ogres',
-      units: [
-        {
-          name: 'Warriors',
-          defense: 5,
-          nerve: {
-            waver: 15,
-            rout: 17,
-          },
-          inspired: true,
-        },
-      ]
-    },
-  ]
-  constructor() { }
+  constructor(private factionsService: FactionsService) { }
 
   addAttacker(): void {
     this.charge.attackers = [

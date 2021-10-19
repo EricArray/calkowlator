@@ -18,6 +18,7 @@ export interface Attacker {
   brutal?: DicePlusNumber;
   abilities: Ability[];
   facing: 'front' | 'flank' | 'rear';
+  hindered?: boolean;
 }
 
 export function cloneAttacker(originalAttacker: Attacker): Attacker {

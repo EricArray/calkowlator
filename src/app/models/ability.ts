@@ -1,3 +1,4 @@
+import { max, min } from "mathjs";
 import { Attacker } from "./attacker";
 import { Defender } from "./defender";
 
@@ -136,5 +137,21 @@ export class Weakened extends Ability {
     }
     clone(): Ability {
         return new Weakened()
+    }
+}
+
+export class Hindered extends Ability {
+    constructor() { super('Hindered', 'no-value', undefined) }
+    applyModification(attacker: Attacker, defender: Defender): Attacker {
+        return {
+            ...attacker,
+            hindered: true,
+            // TODO: hit on 7+
+            melee: min(6, attacker.melee + 1),
+            tc: max(0, (attacker.tc ?? 0) - 1),
+        }
+    }
+    clone(): Ability {
+        return new Hindered()
     }
 }

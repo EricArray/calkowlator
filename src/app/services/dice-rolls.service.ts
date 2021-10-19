@@ -68,20 +68,26 @@ export class DiceRollsService {
 
       // add dice that will be rerolled to the normal dice, then remove that many dice
       let table = this.tableOfProbilitiesToGetSuccesses(params.attack + topReroll, singleHitProbability)
+
+      // remove dice added because of rerolls
+      const newTable = new Map<number, MathType>()
+      for (const [hits, hitsProbability] of table) {
+        const realHits = min(hits, params.attack)
+        newTable.set(realHits, hitsProbability)
+      }
+      table = newTable
+
       if (params.blast) {
         table = this.applyBlast(table, params.attack, params.blast)
       }
 
       for (const [hits, hitsProbability] of table) {
-        // remove dice added because of rerolls
-        const realHits = min(hits, params.attack)
-
         const finalProbability = add(
-          finalTable.get(realHits) ?? fraction(0),
+          finalTable.get(hits) ?? fraction(0),
           multiply(probabilityToRerollThisManyDice, hitsProbability),
         )
 
-        finalTable.set(realHits, finalProbability)
+        finalTable.set(hits, finalProbability)
       }
     }
     return finalTable

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FactionsService } from '@app/services/factions.service';
-import { Ability, BaneChanted, Blast, Brutal, Elite,  RerollToHit,  RerollToWound,  Vicious, Weakened } from '@models/ability';
+import { Ability, BaneChanted, Blast, Brutal, Elite,  Hindered,  RerollToHit,  RerollToWound,  Vicious, Weakened } from '@models/ability';
 import { Attacker, cloneAttacker } from '@models/attacker';
 import { cloneDefender, Defender } from '@models/defender';
 
@@ -50,6 +50,7 @@ export class ChargeInputComponent  {
     new Brutal(),
     new BaneChanted(),
     new Weakened(),
+    new Hindered(),
   ]
 
   loadAttackerFactions = this.factionsService.loadAttackerFactions

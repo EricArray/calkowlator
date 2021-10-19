@@ -7,7 +7,7 @@
                 <td>Att</td>
                 <td>CS</td>
                 <td>TC</td>
-                <td>Abilities</td>
+                <td>Special</td>
                 <td>Facing</td>
             </tr>
         </thead>
@@ -19,7 +19,7 @@
                 <td><input class="form-control two-digits" type="number" min="0" max="100" [(ngModel)]="attacker.attack"></td>
                 <td><input class="form-control" type="number" min="0" max="6" [(ngModel)]="attacker.cs"></td>
                 <td><input class="form-control" type="number" min="0" max="6" [(ngModel)]="attacker.tc"></td>
-                <td style="width: 300px">
+                <td style="width: 350px">
                     <div style="display: flex; flex-wrap: wrap;">
                         <app-modifier-chip
                             *ngFor="let ability of attacker.abilities"

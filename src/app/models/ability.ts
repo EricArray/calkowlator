@@ -113,3 +113,28 @@ export class Brutal extends Ability {
     }
 }
 
+export class BaneChanted extends Ability {
+    constructor() { super('Bane Chanted', 'no-value', undefined) }
+    applyModification(attacker: Attacker, defender: Defender): Attacker {
+        return {
+            ...attacker,
+            cs: (attacker.cs ?? 0) + 1,
+        }
+    }
+    clone(): Ability {
+        return new BaneChanted()
+    }
+}
+
+export class Weakened extends Ability {
+    constructor() { super('Weakened', 'no-value', undefined) }
+    applyModification(attacker: Attacker, defender: Defender): Attacker {
+        return {
+            ...attacker,
+            cs: (attacker.cs ?? 0) - 1,
+        }
+    }
+    clone(): Ability {
+        return new Weakened()
+    }
+}

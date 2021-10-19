@@ -6,7 +6,7 @@
     padding-right: 10px;
     display: flex;
     align-items: center;
-    width: min-content;
+    width: max-content;
 }
 
 :host:hover {

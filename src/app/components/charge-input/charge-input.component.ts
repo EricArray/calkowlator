@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Ability, Blast, Brutal, Elite,  RerollToHit,  RerollToWound,  Vicious } from '@models/ability';
+import { Ability, BaneChanted, Blast, Brutal, Elite,  RerollToHit,  RerollToWound,  Vicious, Weakened } from '@models/ability';
 import { Attacker, cloneAttacker } from '@models/attacker';
 import { cloneDefender, Defender } from '@models/defender';
 
@@ -47,6 +47,8 @@ export class ChargeInputComponent  {
     new RerollToWound(),
     new Blast(),
     new Brutal(),
+    new BaneChanted(),
+    new Weakened(),
   ]
 
   loadAttackerFactions: { factionName: string; units: Attacker[] }[] = [

@@ -1,11 +1,14 @@
 import { Component, ViewChild } from '@angular/core';
+import { cloneDeep } from 'lodash';
 import { format, Fraction, map, MathType, max, multiply, number, sum } from 'mathjs';
 import { CHARGE_COLORS } from './colors';
-import { Charge, ChargeInputComponent } from './components/charge-input/charge-input.component';
-import { Attacker } from './models/attacker';
+import { ChargeInputComponent } from './components/charge-input/charge-input.component';
+import { AttackerInputValues } from './models/attacker-input-values';
+import { AttackerInputValuesProcessed } from './models/attacker-input-values-processed';
+import { ChargeInputValues } from './models/charge-input-values';
 import { ChargeResult } from './models/charge-result';
-import { Defender } from './models/defender';
-import { NerveTest } from './models/nerve-test';
+import { DefenderInputValues } from './models/defender-input-values';
+import { DicePlusNumber } from './models/dice-plus-number';
 import { DiceRollsService } from './services/dice-rolls.service';
 
 function formatPercent(value: number): string {
@@ -26,7 +29,7 @@ export class AppComponent {
   results: ChargeResult[] = []
   error = false
 
-  get charges(): Charge[] {
+  get charges(): ChargeInputValues[] {
     return (
       this.charge1Component && this.charge2Component
         ? [
@@ -44,7 +47,6 @@ export class AppComponent {
     try {
       this.results = this.charges.map(charge => {
         const modifiedAttackers = charge.attackers
-          .filter(attacker => attacker.active)
           .map(attacker => this.applyAttackerAbilities(attacker, charge.defender))
 
         const attackersResults = modifiedAttackers
@@ -79,7 +81,7 @@ export class AppComponent {
         const hitsTable = this.diceRollsService.combineTables(hitsTables)
         const woundsTable = this.diceRollsService.combineTables(woundsTables)
         
-        const nerveModifiers = modifiedAttackers.map(attacker => attacker.brutal).filter(brutal => !!brutal) as any[]
+        const nerveModifiers = modifiedAttackers.map(attacker => attacker.brutal).filter(brutal => !!brutal) as DicePlusNumber[]
         const nerveTest = this.diceRollsService.nerveTest(woundsTable, charge.defender, nerveModifiers)
 
         return <ChargeResult>{
@@ -95,12 +97,19 @@ export class AppComponent {
     }
   }
 
-  applyAttackerAbilities(attacker: Attacker, defender: Defender): Attacker {
-    let modifiedAttacker = attacker
-    for (const ability of attacker.abilities) {
-      modifiedAttacker = ability.applyModification(modifiedAttacker, defender)
+  applyAttackerAbilities(attacker: AttackerInputValues, defender: DefenderInputValues): AttackerInputValuesProcessed {
+    let attackerProcessed: AttackerInputValuesProcessed = {
+      ...attacker,
+      attackModifiers: [],
+      elite: false,
+      vicious: false,
+      rerollToHitList: [],
+      rerollToWoundList: [],
     }
-    return modifiedAttacker
+    for (const ability of attacker.abilities) {
+      attackerProcessed = ability.applyModification(attackerProcessed, defender)
+    }
+    return attackerProcessed
   }
 
 }

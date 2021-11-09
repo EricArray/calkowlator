@@ -1,9 +1,9 @@
 import { Fraction } from "mathjs";
-import { Charge } from "../components/charge-input/charge-input.component";
+import { ChargeInputValues } from "./charge-input-values";
 import { NerveTest } from "./nerve-test";
 
 export interface ChargeResult {
-    charge: Charge;
+    charge: ChargeInputValues;
     
     hitsTable: Map<number, Fraction>;
     woundsTable: Map<number, Fraction>;

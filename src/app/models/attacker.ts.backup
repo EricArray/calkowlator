@@ -1,6 +1,6 @@
-import { Melee } from "../services/dice-rolls.service";
 import { Ability } from "./ability";
 import { DicePlusNumber } from "./dice-plus-number";
+import { Melee } from "./unit-attributes";
 
 export interface Attacker {
   wasLoaded?: boolean;

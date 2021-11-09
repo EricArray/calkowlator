@@ -1,309 +1,94 @@
 import { Injectable } from '@angular/core';
 import { Blast, Brutal, Elite, Rampage, Vicious } from '@app/models/ability';
-import { Attacker } from '@app/models/attacker';
-import { Defender } from '@app/models/defender';
+import { UnitDefinition } from '@app/models/unit-definition';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FactionsService {
 
-  loadAttackerFactions: { factionName: string; units: Attacker[] }[] = [
+  unitFactions: { factionName: string; units: UnitDefinition[] }[] = [
+    // GOBLINS
     {
       factionName: 'Goblins',
       units: [
         {
-          name: 'Rabble Regiment',
-          active: true,
+          name: 'Rabble',
           melee: 5,
-          attack: { plus: 12 },
-          attackModifiers: [],
-          elite: false,
-          vicious: false,
-          rerollToHitList: [],
-          rerollToWoundList: [],
+          defense: 4,
+          sizes: [
+            {
+              size: 'Regiment',
+              attack: { plus: 12 },
+              nerve: { waver: 12, rout: 14 },
+            },
+            {
+              size: 'Horde',
+              attack: { plus: 25 },
+              nerve: { waver: 19, rout: 21 },
+            },
+            {
+              size: 'Legion',
+              attack: { plus: 30 },
+              nerve: { waver: 25, rout: 27 },
+            },
+          ],
           abilities: [],
-          facing: 'front'
+          affectedBy: {
+            rampage: true,
+          }
         },
         {
           name: 'Mawpup upgrade',
-          active: true,
           melee: 4,
-          attack: { plus: 6 },
-          attackModifiers: [],
-          cs: 1,
-          elite: false,
-          vicious: false,
-          rerollToHitList: [],
-          rerollToWoundList: [],
-          abilities: [],
-          facing: 'front'
-        },
-        {
-          name: 'Giant',
-          active: true,
-          melee: 4,
-          attack: { dice: 6, plus: 8 },
-          attackModifiers: [],
-          cs: 4,
-          elite: false,
-          vicious: false,
-          rerollToHitList: [],
-          rerollToWoundList: [],
-          abilities: [
-            new Brutal({ plus: 1 }),
-          ],
-          facing: 'front'
-        },
-        {
-          name: 'Big Rock Thrower + Elite',
-          active: true,
-          melee: 5,
-          attack: { plus: 2 },
-          attackModifiers: [],
-          cs: 3,
-          elite: true,
-          vicious: false,
-          rerollToHitList: [],
-          rerollToWoundList: [],
-          abilities: [
-            new Blast({ dice: 3, plus: 1 }),
-            new Elite(),
-          ],
-          facing: 'front'
-        },
-      ]
-    },
-    {
-      factionName: 'Abyssal Dwarfs',
-      units: [
-        {
-          name: 'Grog Mortar',
-          active: true,
-          melee: 5,
-          attack: { plus: 2 },
-          attackModifiers: [],
-          cs: 2,
-          elite: false,
-          vicious: true,
-          rerollToHitList: [],
-          rerollToWoundList: [],
-          abilities: [
-            new Blast({ dice: 3, plus: 1 }),
-            new Vicious(),
-          ],
-          facing: 'front'
-        },
-        {
-          name: 'Hellfane (Melee)',
-          active: true,
-          melee: 3,
-          attack: { plus: 9 },
-          attackModifiers: [],
-          cs: 2,
-          tc: 2,
-          elite: false,
-          vicious: true,
-          rerollToHitList: [],
-          rerollToWoundList: [],
-          abilities: [
-            new Brutal({ plus: 1 }),
-            new Rampage({ dice: 6 }),
-            new Vicious(),
-          ],
-          facing: 'front'
-        },
-      ],
-    },
-    {
-      factionName: 'Ogres',
-      units: [
-        {
-          name: 'Warriors',
-          active: true,
-          melee: 3,
-          attack: { plus: 18 },
-          attackModifiers: [],
-          cs: 1,
-          elite: false,
-          vicious: false,
-          rerollToHitList: [],
-          rerollToWoundList: [],
-          abilities: [
-            new Brutal({ plus: 1 }),
-          ],
-          facing: 'front'
-        },
-      ]
-    },
-    {
-      factionName: 'Undead',
-      units: [
-        {
-          name: 'Zombies Legion',
-          active: true,
-          melee: 5,
-          attack: { plus: 30 },
-          attackModifiers: [],
-          elite: false,
-          vicious: false,
-          rerollToHitList: [],
-          rerollToWoundList: [],
-          abilities: [],
-          facing: 'front',
-        },
-        {
-          name: 'Goreblight',
-          active: true,
-          melee: 4,
-          attack: { dice: 6, plus: 6 },
-          attackModifiers: [],
-          cs: 2,
-          elite: false,
-          vicious: false,
-          rerollToHitList: [],
-          rerollToWoundList: [],
-          abilities: [],
-          facing: 'front',
-        },
-      ]
-    },
-    {
-      factionName: 'Elves',
-      units: [
-        {
-          name: 'Kindred Archers Horde (Melee)',
-          active: true,
-          melee: 5,
-          attack: { plus: 20 },
-          attackModifiers: [],
-          elite: false,
-          vicious: false,
-          rerollToHitList: [],
-          rerollToWoundList: [],
-          abilities: [],
-          facing: 'front',
-        },
-        {
-          name: 'Kindred Archers Horde (Shooting)',
-          active: true,
-          melee: 4,
-          attack: { plus: 20 },
-          attackModifiers: [],
-          elite: true,
-          vicious: false,
-          rerollToHitList: [],
-          rerollToWoundList: [],
-          abilities: [
-            new Elite(),
-          ],
-          facing: 'front',
-        },
-      ]
-    },
-  ]
-
-  loadDefenderFactions: { factionName: string; units: Defender[] }[] = [
-    {
-      factionName: 'Goblins',
-      units: [
-        {
-          name: 'Rabble Regiment',
-          defense: 4,
-          nerve: {
-            waver: 12,
-            rout: 14,
-          },
-          affectedByRampage: true,
-          inspired: true,
-        },
-        {
-          name: 'Big Rock Thrower',
-          defense: 4,
-          nerve: {
-            waver: 9,
-            rout: 11,
-          },
-          inspired: true,
-        },
-      ]
-    },
-    {
-      factionName: 'Abyssal Dwarfs',
-      units: [
-        {
-          name: 'Grog Mortar',
-          defense: 5,
-          nerve: {
-            waver: 10,
-            rout: 12,
-          },
-          inspired: true,
-        },
-        {
-          name: 'Gargoyles',
-          defense: 3,
-          nerve: {
-            waver: 8,
-            rout: 10,
-          },
-          affectedByRampage: true,
-          inspired: true,
-        },
-        {
-          name: 'Hellfane',
-          defense: 6,
-          nerve: {
-            waver: 'fearless',
-            rout: 18,
-          },
-          affectedBySlayer: true,
-          inspired: true,
-        },
-      ]
-    },
-    {
-      factionName: 'Ogres',
-      units: [
-        {
-          name: 'Warriors',
-          defense: 5,
-          nerve: {
-            waver: 15,
-            rout: 17,
-          },
-          affectedBySlayer: true,
-          inspired: true,
-        },
-      ]
-    },
-    {
-      factionName: 'Undead',
-      units: [
-        {
-          name: 'Zombies Legion',
           defense: 2,
-          nerve: {
-            waver: 'fearless',
-            rout: 28,
-          },
-          affectedByRampage: true,
-          inspired: true,
+          sizes: [
+            {
+              size: '1',
+              attack: { plus: 6 },
+              nerve: { waver: 0, rout: 0 },
+            }
+          ],
+          cs: 1,
+          abilities: [],
+          affectedBy: {},
+          attackerOnly: true,
         },
       ]
     },
+
+    // OGRES
     {
-      factionName: 'Elves',
+      factionName: 'Ogres',
       units: [
         {
-          name: 'Kindred Archers Horde',
-          defense: 3,
-          nerve: {
-            waver: 21,
-            rout: 23,
-          },
-          affectedByRampage: true,
-          inspired: true,
+          name: 'Warriors',
+          melee: 3,
+          defense: 5,
+          sizes: [
+            {
+              size: 'Regiment',
+              attack: { plus: 9 },
+              nerve: { waver: 12, rout: 14 },
+            },
+            {
+              size: 'Horde',
+              attack: { plus: 18 },
+              nerve: { waver: 15, rout: 17 },
+            },
+            {
+              size: 'Legion',
+              attack: { plus: 36 },
+              nerve: { waver: 22, rout: 24 },
+            },
+          ],
+          cs: 1,
+          abilities: [
+            new Brutal({ plus: 1 }),
+          ],
+          affectedBy: {
+            slayer: true,
+          }
         },
       ]
     },

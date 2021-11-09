@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core';
 import { add, factorial, fraction, MathType, max, min, multiply, pow, round, subtract, sum } from 'mathjs';
-import { Defender } from '@models/defender';
 import { NerveTest } from '@models/nerve-test';
 import { fromTo, fromZeroTo } from '../util';
 import { DicePlusNumber } from '@app/models/dice-plus-number';
-
-export type Melee = 2 | 3 | 4 | 5 | 6;
+import { Melee } from '@app/models/unit-attributes';
+import { DefenderInputValues } from '@app/models/defender-input-values';
 
 export function diceProbability(required: 1 | 2 | 3 | 4 | 5 | 6): MathType {
   return fraction(7 - required, 6)
@@ -268,7 +267,7 @@ export class DiceRollsService {
     return differenceTable
   }
 
-  nerveTest(woundsTable: Map<number, MathType>, defender: Defender, nerveModifiers: DicePlusNumber[]): NerveTest {
+  nerveTest(woundsTable: Map<number, MathType>, defender: DefenderInputValues, nerveModifiers: DicePlusNumber[]): NerveTest {
     const nerveTest = <NerveTest>{
       steady: fraction(0),
       waver: fraction(0),
@@ -328,7 +327,7 @@ export class DiceRollsService {
     }
   }
 
-  private nerveTestWithWounds(wounds: number, defender: Defender): NerveTest {
+  private nerveTestWithWounds(wounds: number, defender: DefenderInputValues): NerveTest {
     const sumTable2d6 = this.getDiceSumTable(2, 6)
 
     const toRout = defender.nerve.rout - wounds

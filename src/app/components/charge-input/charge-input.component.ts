@@ -1,27 +1,34 @@
 import { Component } from '@angular/core';
+import { AttackerInputValues } from '@app/models/attacker-input-values';
+import { ChargeInputValues } from '@app/models/charge-input-values';
+import { DefenderInputValues } from '@app/models/defender-input-values';
 import { FactionsService } from '@app/services/factions.service';
 import { Ability, BaneChanted, Blast, Brutal, Elite,  Hindered,  Rampage,  RerollToHit,  RerollToWound,  Slayer,  Vicious, Weakened } from '@models/ability';
-import { Attacker, cloneAttacker } from '@models/attacker';
-import { cloneDefender, Defender } from '@models/defender';
+import { cloneDeep } from 'lodash';
+import { UnitDefinition, UnitSize } from '@models/unit-definition';
+import { DicePlusNumber } from '@app/models/dice-plus-number';
+import { Nerve } from '@app/models/unit-attributes';
 
-function defaultAttacker(): Attacker {
-  return {
-    active: true,
-    melee: 4,
-    attack: { plus: 12 },
-    attackModifiers: [],
-    elite: false,
-    vicious: false,
-    facing: 'front',
-    abilities: [],
-    rerollToHitList: [],
-    rerollToWoundList: [],
-  }
+const defaultAttacker: AttackerInputValues = {
+  name: '',
+  melee: 4,
+  attack: { plus: 12 },
+  abilities: [],
+  facing: 'front',
+  hindered: false,
+  wasLoaded: false,
 }
 
-export interface Charge {
-  attackers: Attacker[];
-  defender: Defender;
+const defaultDefender: DefenderInputValues = {
+  name: '',
+  defense: 4,
+  nerve: {
+    waver: 13,
+    rout: 15,
+  },
+  affectedBy: {},
+  inspired: true,
+  wasLoaded: false,
 }
 
 @Component({
@@ -30,16 +37,9 @@ export interface Charge {
   styleUrls: ['./charge-input.component.css'],
 })
 export class ChargeInputComponent  {
-  charge: Charge = {
-    attackers: [ defaultAttacker() ],
-    defender: {
-      defense: 5,
-      nerve: {
-        waver: 15,
-        rout: 17,
-      },
-      inspired: true,
-    },
+  charge: ChargeInputValues = {
+    attackers: [ cloneDeep(defaultAttacker) ],
+    defender: cloneDeep(defaultDefender),
   }
 
   abilityOptions: Ability[] = [
@@ -56,21 +56,20 @@ export class ChargeInputComponent  {
     new Hindered(),
   ]
 
-  loadAttackerFactions = this.factionsService.loadAttackerFactions
-  loadDefenderFactions = this.factionsService.loadDefenderFactions
+  unitFactions = this.factionsService.unitFactions
 
   constructor(private factionsService: FactionsService) { }
 
   addAttacker(): void {
     this.charge.attackers = [
       ...this.charge.attackers,
-      defaultAttacker()
+      cloneDeep(defaultAttacker)
     ]
   }
 
   duplicateAttacker(duplicateIndex: number): void {
     const originalAttacker = this.charge.attackers[duplicateIndex]
-    const newAttacker = cloneAttacker(originalAttacker)
+    const newAttacker = cloneDeep(originalAttacker)
     this.charge.attackers.splice(duplicateIndex + 1, 0, newAttacker)
   }
 
@@ -81,37 +80,53 @@ export class ChargeInputComponent  {
     }
   }
 
-  loadAttacker(loadAttackerOption: Attacker): void {
-    const newAttacker = cloneAttacker(loadAttackerOption)
-    newAttacker.wasLoaded = true;
+  loadAttacker(loadAttackerOption: UnitDefinition, sizeOption: { size: UnitSize; attack: DicePlusNumber; nerve: Nerve }): void {
+    const newAttacker: AttackerInputValues = {
+      name: loadAttackerOption.name + ' ' + sizeOption.size,
+      melee: loadAttackerOption.melee,
+      attack: cloneDeep(sizeOption.attack),
+      cs: loadAttackerOption.cs,
+      tc: loadAttackerOption.tc,
+      abilities: cloneDeep(loadAttackerOption.abilities),
+      facing: 'front',
+      hindered: false,
+      wasLoaded: true,
+    }
     this.charge.attackers = [
       ...this.charge.attackers,
       newAttacker,
     ]
   }
 
-  addAbility(attacker: Attacker, abilityOption: Ability): void {
-    const newAbilityInstance = abilityOption.clone()
+  addAbility(attacker: AttackerInputValues, abilityOption: Ability): void {
+    const newAbilityInstance = cloneDeep(abilityOption)
     attacker.abilities.push(newAbilityInstance)
   }
 
-  removeAbility(attacker: Attacker, abilityToRemove: Ability): void {
+  removeAbility(attacker: AttackerInputValues, abilityToRemove: Ability): void {
     attacker.abilities = attacker.abilities.filter(ability => ability !== abilityToRemove)
   }
 
-  disableAbilityOption(attacker: Attacker, abilityOption: Ability): boolean {
+  disableAbilityOption(attacker: AttackerInputValues, abilityOption: Ability): boolean {
     return !abilityOption.stackable && attacker.abilities.some(ability => ability.name === abilityOption.name)
   }
 
-  incompatibleAbilityOption(attacker: Attacker, abilityOption: Ability): Ability | undefined {
+  incompatibleAbilityOption(attacker: AttackerInputValues, abilityOption: Ability): Ability | undefined {
     return attacker.abilities.find(attackerAbility =>
       abilityOption.incompatibleAbilityTypes().some(incompatibleAbilityTypes => attackerAbility instanceof incompatibleAbilityTypes)
     )
   }
 
-  loadDefender(defender: Defender): void {
-    this.charge.defender = cloneDefender(defender)
-    this.charge.defender.wasLoaded = true
+  loadDefender(defenderDefinition: UnitDefinition, sizeOption: { size: UnitSize; attack: DicePlusNumber; nerve: Nerve }): void {
+    const newDefender: DefenderInputValues = {
+      name: defenderDefinition.name + ' ' + sizeOption.size,
+      defense: defenderDefinition.defense,
+      nerve: cloneDeep(sizeOption.nerve),
+      inspired: true,
+      affectedBy: cloneDeep(defenderDefinition.affectedBy),
+      wasLoaded: true,
+    }
+    this.charge.defender = newDefender
   }
 
 }

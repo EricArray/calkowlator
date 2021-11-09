@@ -161,7 +161,7 @@ export class ChargeOutputComponent implements AfterViewInit, OnChanges {
   private buildHitsData(): ChartData {
     this.hitsAverages = this.results.map((chargeResult, index) => ({
       chargeName: 'Charge #' + (index + 1),
-      average: format(this.getTableAverage(chargeResult.hitsTable), 2)
+      average: format(this.getTableAverage(chargeResult.hitsTable), 3)
     }))
 
     const COLORS = ['red', 'green', 'blue']
@@ -189,7 +189,7 @@ export class ChargeOutputComponent implements AfterViewInit, OnChanges {
   private buildWoundsData(): ChartData {
     this.woundsAverages = this.results.map((chargeResult, index) => ({
       chargeName: 'Charge #' + (index + 1),
-      average: format(this.getTableAverage(chargeResult.woundsTable), 2)
+      average: format(this.getTableAverage(chargeResult.woundsTable), 3)
     }))
 
 

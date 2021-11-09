@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FactionsService } from '@app/services/factions.service';
-import { Ability, BaneChanted, Blast, Brutal, Elite,  Hindered,  RerollToHit,  RerollToWound,  Vicious, Weakened } from '@models/ability';
+import { Ability, BaneChanted, Blast, Brutal, Elite,  Hindered,  Rampage,  RerollToHit,  RerollToWound,  Slayer,  Vicious, Weakened } from '@models/ability';
 import { Attacker, cloneAttacker } from '@models/attacker';
 import { cloneDefender, Defender } from '@models/defender';
 
@@ -8,7 +8,8 @@ function defaultAttacker(): Attacker {
   return {
     active: true,
     melee: 4,
-    attack: 12,
+    attack: { plus: 12 },
+    attackModifiers: [],
     elite: false,
     vicious: false,
     facing: 'front',
@@ -48,6 +49,8 @@ export class ChargeInputComponent  {
     new RerollToWound(),
     new Blast(),
     new Brutal(),
+    new Slayer(),
+    new Rampage(),
     new BaneChanted(),
     new Weakened(),
     new Hindered(),

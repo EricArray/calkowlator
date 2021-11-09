@@ -43,32 +43,16 @@ export class AppComponent {
         const modifiedAttackers = charge.attackers
           .filter(attacker => attacker.active)
           .map(attacker => this.applyAttackerAbilities(attacker, charge.defender))
-          .map(attacker => {
-            let modifiedAttack = attacker.attack;
-            if (attacker.facing === 'flank') {
-              modifiedAttack *= 2
-            }
-            if (attacker.facing === 'rear') {
-              modifiedAttack *= 3
-            }
-
-            console.log('modified attacker', attacker.name, attacker)
-
-            return <Attacker>{
-              ...attacker,
-              attack: modifiedAttack
-            }
-          })
-
 
         const attackersResults = modifiedAttackers
           .map(attacker => {
             const hitsTable = this.diceRollsService.hitsTable({
               attack: attacker.attack,
+              attackModifiers: attacker.attackModifiers,
               melee: attacker.melee,
               elite: attacker.elite,
               rerollList: attacker.rerollToHitList,
-              blast: attacker.blast
+              blast: attacker.blast,
             })
 
             const modifiedDefense = charge.defender.defense - ((attacker.cs ?? 0) + (attacker.tc ?? 0))

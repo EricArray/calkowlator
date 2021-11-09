@@ -114,6 +114,40 @@ export class Brutal extends Ability {
     }
 }
 
+export class Slayer extends Ability {
+    constructor(value = {}) { super('Slayer', 'dice-plus-number', value) }
+    applyModification(attacker: Attacker, defender: Defender): Attacker {
+        if (defender.affectedBySlayer) {
+            return {
+                ...attacker,
+                attackModifiers: [ ...attacker.attackModifiers, this.value ]
+            }
+        } else {
+            return attacker
+        }
+    }
+    clone(): Ability {
+        return new Slayer({ ... this.value })
+    }
+}
+
+export class Rampage extends Ability {
+    constructor(value = {}) { super('Rampage', 'dice-plus-number', value) }
+    applyModification(attacker: Attacker, defender: Defender): Attacker {
+        if (defender.affectedByRampage) {
+            return {
+                ...attacker,
+                attackModifiers: [ ...attacker.attackModifiers, this.value ]
+            }
+        } else {
+            return attacker
+        }
+    }
+    clone(): Ability {
+        return new Rampage({ ... this.value })
+    }
+}
+
 export class BaneChanted extends Ability {
     constructor() { super('Bane Chanted', 'no-value', undefined) }
     applyModification(attacker: Attacker, defender: Defender): Attacker {

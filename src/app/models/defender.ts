@@ -7,6 +7,8 @@ export interface Defender {
   };
   inspired: boolean;
   wasLoaded?: boolean;
+  affectedBySlayer?: boolean;
+  affectedByRampage?: boolean;
 }
 
 export function cloneDefender(defender: Defender): Defender {

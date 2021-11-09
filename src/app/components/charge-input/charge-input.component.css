@@ -21,6 +21,7 @@
     align-items: center;
 }
 
-.was-loaded .form-control.ng-pristine {
+.was-loaded .form-control.ng-pristine,
+.was-loaded .form-select.ng-pristine {
     background-color: beige;
 }

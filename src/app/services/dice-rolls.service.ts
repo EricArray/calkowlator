@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { add, factorial, fraction, MathType, max, min, multiply, pow, round, subtract } from 'mathjs';
+import { add, factorial, fraction, MathType, max, min, multiply, pow, round, subtract, sum } from 'mathjs';
 import { Defender } from '@models/defender';
 import { NerveTest } from '@models/nerve-test';
 import { fromTo, fromZeroTo } from '../util';
@@ -12,7 +12,8 @@ export function diceProbability(required: 1 | 2 | 3 | 4 | 5 | 6): MathType {
 }
 
 export interface HitsParams {
-  attack: number;
+  attack: DicePlusNumber;
+  attackModifiers?: DicePlusNumber[];
   melee: Melee;
   elite: boolean;
   rerollList: { amount: DicePlusNumber, onlyOnes: boolean }[];
@@ -63,31 +64,37 @@ export class DiceRollsService {
 
     const finalTable = new Map<number, MathType>()
     for (const { willReroll, probabilityToRerollThisManyDice } of this.combineRerolls(params.rerollList)) {
-      // will never be able to reroll more that the initial dice
-      const topReroll = min(params.attack, willReroll)
-
-      // add dice that will be rerolled to the normal dice, then remove that many dice
-      let table = this.tableOfProbilitiesToGetSuccesses(params.attack + topReroll, singleHitProbability)
-
-      // remove dice added because of rerolls
-      const newTable = new Map<number, MathType>()
-      for (const [hits, hitsProbability] of table) {
-        const realHits = min(hits, params.attack)
-        newTable.set(realHits, hitsProbability)
-      }
-      table = newTable
-
-      if (params.blast) {
-        table = this.applyBlast(table, params.attack, params.blast)
-      }
-
-      for (const [hits, hitsProbability] of table) {
-        const finalProbability = add(
-          finalTable.get(hits) ?? fraction(0),
-          multiply(probabilityToRerollThisManyDice, hitsProbability),
-        )
-
-        finalTable.set(hits, finalProbability)
+      // treat the normal attack as an attack modifier to compute the sum
+      // TODO: move this logic out of this method, into the caller method or something
+      const combinedAttackModifiers = this.combineAttackModifiers([params.attack, ...params.attackModifiers ?? []]);
+      console.log("combined attack modifiers", combinedAttackModifiers)
+      for (const [ attacks, probabilityOfAttacks ] of combinedAttackModifiers) {
+        // will never be able to reroll more that the initial dice
+        const topReroll = min(attacks, willReroll)
+  
+        // add dice that will be rerolled to the normal dice, then remove that many dice
+        let table = this.tableOfProbilitiesToGetSuccesses(attacks + topReroll, singleHitProbability)
+  
+        // remove dice added because of rerolls
+        const newTable = new Map<number, MathType>()
+        for (const [hits, hitsProbability] of table) {
+          const realHits = min(hits, attacks)
+          newTable.set(realHits, hitsProbability)
+        }
+        table = newTable
+  
+        if (params.blast) {
+          table = this.applyBlast(table, attacks, params.blast)
+        }
+  
+        for (const [hits, hitsProbability] of table) {
+          const finalProbability = add(
+            finalTable.get(hits) ?? fraction(0),
+            multiply(probabilityToRerollThisManyDice, multiply(hitsProbability, probabilityOfAttacks)),
+          )
+  
+          finalTable.set(hits, finalProbability)
+        }
       }
     }
     return finalTable
@@ -114,6 +121,27 @@ export class DiceRollsService {
       accumTable = newTable
     }
     return [...accumTable.entries()].map(([willReroll, probabilityToRerollThisManyDice]) => ({ willReroll, probabilityToRerollThisManyDice}))
+  }
+
+  private combineAttackModifiers(attackModifiers: DicePlusNumber[]): Map<number, MathType> {
+    const combinedDiceModifiers = this.getDiceSumTableFromList(
+      attackModifiers
+        .filter(attackModifier => !!attackModifier.dice)
+        .map(attackModifier => attackModifier.dice as 3 | 6)
+    )
+    const combinedPlusModifier = sum(
+      0, // put a 0 in case there are no other values
+      ...attackModifiers
+        .filter(attackModifier => !!attackModifier.plus)
+        .map(attackModifier => attackModifier.plus as number)
+    )
+
+    const table = new Map<number, MathType>()
+    for (const [diceSum, diceSumProbability] of combinedDiceModifiers.entries()) {
+      const total = diceSum + combinedPlusModifier
+      table.set(total, add(diceSumProbability, table.get(total) ?? fraction(0)))
+    }
+    return table
   }
 
   applyBlast(hitsTable: Map<number, MathType>, attack: number, blast: { dice?: 3 | 6, plus?: number }): Map<number, MathType> {
@@ -155,12 +183,36 @@ export class DiceRollsService {
     return numerators.map(numerator => fraction(numerator, denominator))
   }
 
+  private getDiceSumTableFromList(diceList: (3 | 6)[]): MathType[] {
+    if (diceList.length === 0) {
+      return [fraction(1)]
+    }
+
+    let numerators = [1] // start at 0 dice; 100% of getting 0
+    for (const dice of diceList) {
+      const newNumerators = Array(numerators.length + dice).fill(0)
+      const sidesInThisDice = fromTo(1, dice)
+      for (const i of numerators.keys()) {
+        for (const side of sidesInThisDice) {
+          const sum = i + side
+          newNumerators[sum] += numerators[i]
+        }
+      }
+      numerators = newNumerators
+    }
+
+    const denominator = diceList.reduce((diceA, diceB) => diceA * diceB, 1)
+
+    return numerators.map(numerator => fraction(numerator, denominator))
+  }
+
   woundsTable(params: WoundsParams): Map<number, MathType> {
     const woundsTable = new Map<number, MathType>()
 
     for (const [hits, hitsProbability] of params.hitsTable) {
+      // use hitsTable() but to calculate wounds
       const woundsTableForThisHits = this.hitsTable({
-        attack: hits,
+        attack: { plus: hits },
         melee: params.defense,
         elite: params.vicious,
         rerollList: params.rerollList,

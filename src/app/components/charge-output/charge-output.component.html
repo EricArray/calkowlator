@@ -1,15 +1,33 @@
 <div class="container">
     <div>
         <canvas #hitsChart style="max-width: 500px; max-height: 250px;" width="500" height="250"></canvas>
-        <p *ngFor="let hitsAverage of hitsAverages">
-            {{ hitsAverage.chargeName }} average: {{ hitsAverage.average }} hits
-        </p>
+        <table>
+            <tbody>
+                <tr>
+                    <td></td>
+                    <td>Average</td>
+                </tr>
+                <tr *ngFor="let hitsAverage of hitsAverages">
+                    <td style="padding-right: 1em">{{ hitsAverage.chargeName }}</td>
+                    <td style="text-align: center;">{{ hitsAverage.average }} hits</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
     <div>
         <canvas #woundsChart style="max-width: 500px; max-height: 250px;" width="500" height="250"></canvas>
-        <p *ngFor="let woundsAverage of woundsAverages">
-            {{ woundsAverage.chargeName }} average: {{ woundsAverage.average }} wounds
-        </p>
+        <table>
+            <tbody>
+                <tr>
+                    <td></td>
+                    <td>Average</td>
+                </tr>
+                <tr *ngFor="let woundsAverage of woundsAverages">
+                    <td style="padding-right: 1em">{{ woundsAverage.chargeName }}</td>
+                    <td style="text-align: center;">{{ woundsAverage.average }} wounds</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
     <div><canvas #nerveTestChart style="max-width: 250px; max-height: 250px" width="250" height="250"></canvas></div>
 </div>

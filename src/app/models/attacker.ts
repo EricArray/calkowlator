@@ -7,7 +7,8 @@ export interface Attacker {
   name?: string;
   active: boolean;
   melee: Melee;
-  attack: number;
+  attack: DicePlusNumber;
+  attackModifiers: DicePlusNumber[];
   cs?: number,
   tc?: number,
   elite: boolean;

@@ -4,7 +4,7 @@
 }
 
 .form-control {
-    width: 3.75em;
+    width: 2.5em;
 }
 
 .form-control[type="text"] {
@@ -12,7 +12,7 @@
 }
 
 .form-control.two-digits {
-    width: 4.25em;
+    width: 3em;
 }
 
 .nerve-input {

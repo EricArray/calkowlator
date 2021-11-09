@@ -1,6 +1,7 @@
 import { max, min } from "mathjs";
 import { AttackerInputValuesProcessed } from "./attacker-input-values-processed";
 import { DefenderInputValues } from "./defender-input-values";
+import { DicePlusNumber } from "./dice-plus-number";
 
 export abstract class Ability {
     constructor(
@@ -14,8 +15,10 @@ export abstract class Ability {
 
     get stackable(): boolean { return false }
     abstract applyModification(attacker: AttackerInputValuesProcessed, defender: DefenderInputValues): AttackerInputValuesProcessed
-    abstract clone(): Ability
-    incompatibleAbilityTypes(): (typeof Ability)[] { return [] }
+    
+    // must return a list of classes derived from Ability
+    // example: return [Elite]
+    incompatibleAbilityTypes(): any[] { return [] }
 }
 
 export class Elite extends Ability {
@@ -25,9 +28,6 @@ export class Elite extends Ability {
             ...attacker,
             elite: true,
         }
-    }
-    clone(): Ability {
-        return new Elite()
     }
     incompatibleAbilityTypes() { return [RerollToHit] }
 }
@@ -40,14 +40,11 @@ export class Vicious extends Ability {
             vicious: true,
         }
     }
-    clone(): Ability {
-        return new Vicious()
-    }
     incompatibleAbilityTypes() { return [RerollToWound] }
 }
 
 export class RerollToHit extends Ability {
-    constructor(value = {}) { super('Reroll to Hit', 'dice-plus-number', value) }
+    constructor(value: DicePlusNumber) { super('Reroll to Hit', 'dice-plus-number', value) }
     get stackable(): boolean { return true }
     applyModification(attacker: AttackerInputValuesProcessed, defender: DefenderInputValues): AttackerInputValuesProcessed {
         return {
@@ -61,14 +58,11 @@ export class RerollToHit extends Ability {
             ]
         }
     }
-    clone(): Ability {
-        return new RerollToHit(this.value)
-    }
     incompatibleAbilityTypes() { return [Elite] }
 }
 
 export class RerollToWound extends Ability {
-    constructor(value = {}) { super('Reroll to Wound', 'dice-plus-number', value) }
+    constructor(value: DicePlusNumber) { super('Reroll to Wound', 'dice-plus-number', value) }
     get stackable(): boolean { return true }
     applyModification(attacker: AttackerInputValuesProcessed, defender: DefenderInputValues): AttackerInputValuesProcessed {
         return {
@@ -82,40 +76,31 @@ export class RerollToWound extends Ability {
             ]
         }
     }
-    clone(): Ability {
-        return new RerollToWound(this.value)
-    }
     incompatibleAbilityTypes() { return [Vicious] }
 }
 
 export class Blast extends Ability {
-    constructor(value = {}) { super('Blast', 'dice-plus-number', value) }
+    constructor(value: DicePlusNumber) { super('Blast', 'dice-plus-number', value) }
     applyModification(attacker: AttackerInputValuesProcessed, defender: DefenderInputValues): AttackerInputValuesProcessed {
         return {
             ...attacker,
             blast: this.value,
         }
     }
-    clone(): Ability {
-        return new Blast({ ... this.value })
-    }
 }
 
 export class Brutal extends Ability {
-    constructor(value = {}) { super('Brutal', 'dice-plus-number', value) }
+    constructor(value: DicePlusNumber) { super('Brutal', 'dice-plus-number', value) }
     applyModification(attacker: AttackerInputValuesProcessed, defender: DefenderInputValues): AttackerInputValuesProcessed {
         return {
             ...attacker,
             brutal: this.value,
         }
     }
-    clone(): Ability {
-        return new Brutal({ ... this.value })
-    }
 }
 
 export class Slayer extends Ability {
-    constructor(value = {}) { super('Slayer', 'dice-plus-number', value) }
+    constructor(value: DicePlusNumber) { super('Slayer', 'dice-plus-number', value) }
     applyModification(attacker: AttackerInputValuesProcessed, defender: DefenderInputValues): AttackerInputValuesProcessed {
         if (defender.affectedBy.slayer) {
             return {
@@ -126,13 +111,10 @@ export class Slayer extends Ability {
             return attacker
         }
     }
-    clone(): Ability {
-        return new Slayer({ ... this.value })
-    }
 }
 
 export class Rampage extends Ability {
-    constructor(value = {}) { super('Rampage', 'dice-plus-number', value) }
+    constructor(value: DicePlusNumber) { super('Rampage', 'dice-plus-number', value) }
     applyModification(attacker: AttackerInputValuesProcessed, defender: DefenderInputValues): AttackerInputValuesProcessed {
         if (defender.affectedBy.rampage) {
             return {
@@ -142,9 +124,6 @@ export class Rampage extends Ability {
         } else {
             return attacker
         }
-    }
-    clone(): Ability {
-        return new Rampage({ ... this.value })
     }
 }
 
@@ -156,9 +135,6 @@ export class BaneChanted extends Ability {
             cs: (attacker.cs ?? 0) + 1,
         }
     }
-    clone(): Ability {
-        return new BaneChanted()
-    }
 }
 
 export class Weakened extends Ability {
@@ -168,9 +144,6 @@ export class Weakened extends Ability {
             ...attacker,
             cs: (attacker.cs ?? 0) - 1,
         }
-    }
-    clone(): Ability {
-        return new Weakened()
     }
 }
 
@@ -184,8 +157,5 @@ export class Hindered extends Ability {
             melee: min(6, attacker.melee + 1),
             tc: max(0, (attacker.tc ?? 0) - 1),
         }
-    }
-    clone(): Ability {
-        return new Hindered()
     }
 }

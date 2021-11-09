@@ -25,6 +25,7 @@ export interface Attacker {
 export function cloneAttacker(originalAttacker: Attacker): Attacker {
   return {
     ...originalAttacker,
+    attack: { ...originalAttacker.attack },
     abilities: originalAttacker.abilities.map(ability => ability.clone()),
   }
 }

@@ -13,7 +13,7 @@ export class FactionsService {
       factionName: 'Goblins',
       units: [
         {
-          name: 'Rabble',
+          name: 'Rabble Regiment',
           active: true,
           melee: 5,
           attack: { plus: 12 },
@@ -208,7 +208,7 @@ export class FactionsService {
       factionName: 'Goblins',
       units: [
         {
-          name: 'Rabble',
+          name: 'Rabble Regiment',
           defense: 4,
           nerve: {
             waver: 12,

@@ -8,7 +8,7 @@
                 <td style="text-align: center">CS</td>
                 <td style="text-align: center">TC</td>
                 <td>Special</td>
-                <td>Facing</td>
+                <td *ngIf="false">Facing</td>
             </tr>
         </thead>
 
@@ -77,7 +77,7 @@
                         </div>
                     </div>
                 </td>
-                <td>
+                <td *ngIf="false">
                     <!-- disabled for now because facing logic has to be moved into dice-rolls.service.ts -->
                     <select class="form-select" [(ngModel)]="attacker.facing" disabled>
                         <option [ngValue]="'front'">Front</option>

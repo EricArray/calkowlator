@@ -1,12 +1,12 @@
 <h1>Cal<b>KoW</b>lator</h1>
 
 <div>
-    <h3 style="text-decoration: underline;" [style.color]="CHARGE_COLORS[0]">Charge #1</h3>
+    <h3 style="text-decoration: underline 2px;" [style.color]="CHARGE_COLORS[0]">Charge #1</h3>
     <app-charge-input #charge1></app-charge-input>
 </div>
 
 <div>
-    <h3 style="text-decoration: underline;" [style.color]="CHARGE_COLORS[1]">Charge #2</h3>
+    <h3 style="text-decoration: underline 2px;" [style.color]="CHARGE_COLORS[1]">Charge #2</h3>
     <app-charge-input #charge2></app-charge-input>
 </div>
 
@@ -30,8 +30,10 @@
         margin-top: 20px;
         border-top: 2px solid black;
         text-align: center;
+        position: relative
     }
 </style>
 <footer>
-    Email: <a href="mailto:ernokstein@gmail.com">ernosktein@gmail.com</a>
+    <div>Email: <a href="mailto:ernokstein@gmail.com">ernosktein@gmail.com</a></div>
+    <div style="position: absolute; right: 0; top: 0"><a href="https://github.com/ernokstein/calkowlator">Source code</a></div>
 </footer>

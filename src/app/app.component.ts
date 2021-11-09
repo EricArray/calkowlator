@@ -1,5 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { format, Fraction, map, MathType, max, multiply, number, sum } from 'mathjs';
+import { CHARGE_COLORS } from './colors';
 import { Charge, ChargeInputComponent } from './components/charge-input/charge-input.component';
 import { Attacker } from './models/attacker';
 import { ChargeResult } from './models/charge-result';
@@ -19,6 +20,8 @@ function formatPercent(value: number): string {
 export class AppComponent {
   @ViewChild('charge1') charge1Component?: ChargeInputComponent
   @ViewChild('charge2') charge2Component?: ChargeInputComponent
+
+  CHARGE_COLORS = CHARGE_COLORS
 
   results: ChargeResult[] = []
   error = false

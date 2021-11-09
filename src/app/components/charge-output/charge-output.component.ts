@@ -3,6 +3,7 @@ import { Chart, ChartData, LineController, registerables } from 'chart.js';
 import { add, format, fraction, MathType, max, multiply, number } from 'mathjs';
 import { ChargeResult } from '@models/charge-result';
 import { fromZeroTo } from '@app/util';
+import { CHARGE_COLORS, NERVE_COLORS } from '@app/colors';
 
 @Component({
   selector: 'app-charge-output',
@@ -164,7 +165,6 @@ export class ChargeOutputComponent implements AfterViewInit, OnChanges {
       average: format(this.getTableAverage(chargeResult.hitsTable), 3)
     }))
 
-    const COLORS = ['red', 'green', 'blue']
     const topHits = max(
       0,
       ...this.results.map(chargeResult => max(0, ...chargeResult.hitsTable.keys()))
@@ -173,8 +173,8 @@ export class ChargeOutputComponent implements AfterViewInit, OnChanges {
 
     const datasets = this.results.map((chargeResult, index) => ({
       label: 'Charge #' + (index + 1),
-      borderColor: COLORS[index],
-      backgroundColor: COLORS[index],
+      borderColor: CHARGE_COLORS[index],
+      backgroundColor: CHARGE_COLORS[index],
       data: labels.map(label => chargeResult.hitsTable.get(label)
         ? number(chargeResult.hitsTable.get(label)) as number
         : null)
@@ -193,7 +193,6 @@ export class ChargeOutputComponent implements AfterViewInit, OnChanges {
     }))
 
 
-    const COLORS = ['red', 'green', 'blue']
     const topWounds = max(
       0,
       ...this.results.map(chargeResult => max(0, ...chargeResult.woundsTable.keys()))
@@ -202,8 +201,8 @@ export class ChargeOutputComponent implements AfterViewInit, OnChanges {
 
     const datasets = this.results.map((chargeResult, index) => ({
       label: 'Charge #' + (index + 1),
-      borderColor: COLORS[index],
-      backgroundColor: COLORS[index],
+      borderColor: CHARGE_COLORS[index],
+      backgroundColor: CHARGE_COLORS[index],
       data: labels.map(label => chargeResult.woundsTable.get(label)
         ? number(chargeResult.woundsTable.get(label)) as number
         : null)
@@ -218,7 +217,7 @@ export class ChargeOutputComponent implements AfterViewInit, OnChanges {
   private buildNerveTestData(): ChartData {
     const labels = ['Steady', 'Waver', 'Rout']
 
-    const COLORS = ['blue', 'green', 'red']
+    const COLORS = [NERVE_COLORS.steady, NERVE_COLORS.waver, NERVE_COLORS.rout]
     const datasets = this.results.map((chargeResult, index) => ({
       label: "Charge #" + (index + 1),
       data: [

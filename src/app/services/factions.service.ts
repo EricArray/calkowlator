@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Blast, Brutal, Elite, Vicious } from '@app/models/ability';
+import { Blast, Brutal, Elite, Rampage, Vicious } from '@app/models/ability';
 import { Attacker } from '@app/models/attacker';
 import { Defender } from '@app/models/defender';
 
@@ -94,6 +94,25 @@ export class FactionsService {
           ],
           facing: 'front'
         },
+        {
+          name: 'Hellfane (Melee)',
+          active: true,
+          melee: 3,
+          attack: { plus: 9 },
+          attackModifiers: [],
+          cs: 2,
+          tc: 2,
+          elite: false,
+          vicious: true,
+          rerollToHitList: [],
+          rerollToWoundList: [],
+          abilities: [
+            new Brutal({ plus: 1 }),
+            new Rampage({ dice: 6 }),
+            new Vicious(),
+          ],
+          facing: 'front'
+        },
       ],
     },
     {
@@ -126,6 +145,20 @@ export class FactionsService {
           melee: 5,
           attack: { plus: 30 },
           attackModifiers: [],
+          elite: false,
+          vicious: false,
+          rerollToHitList: [],
+          rerollToWoundList: [],
+          abilities: [],
+          facing: 'front',
+        },
+        {
+          name: 'Goreblight',
+          active: true,
+          melee: 4,
+          attack: { dice: 6, plus: 6 },
+          attackModifiers: [],
+          cs: 2,
           elite: false,
           vicious: false,
           rerollToHitList: [],
@@ -215,6 +248,16 @@ export class FactionsService {
             rout: 10,
           },
           affectedByRampage: true,
+          inspired: true,
+        },
+        {
+          name: 'Hellfane',
+          defense: 6,
+          nerve: {
+            waver: 'fearless',
+            rout: 18,
+          },
+          affectedBySlayer: true,
           inspired: true,
         },
       ]

@@ -1,6 +1,6 @@
-# Calkowlator
+# CalKoWlator
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.9.
+Calculate hits, wounds, and nerve probabilities for Mantic's Kings of War game
 
 ## Development server
 

@@ -3,8 +3,15 @@ export const CHARGE_COLORS = [
     '#E3560E',
 ]
 
-export const NERVE_COLORS = {
-    steady: 'green',
-    waver: 'blue',
-    rout: 'red',
-}
+export const NERVE_COLORS = [
+    {
+        steady: '#CCB6F6',
+        waver: '#8856EB',
+        rout: '#440BB5',
+    },
+    {
+        steady: '#F6CCB6',
+        waver: '#EB8856',
+        rout: '#B5440B',
+    }
+]

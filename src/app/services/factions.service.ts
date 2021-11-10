@@ -13,6 +13,22 @@ export class FactionsService {
       factionName: 'Goblins',
       units: [
         {
+          name: 'Mawpup upgrade',
+          melee: 4,
+          defense: 2,
+          sizes: [
+            {
+              size: '1',
+              attack: { plus: 6 },
+              nerve: { waver: 0, rout: 0 },
+            }
+          ],
+          cs: 1,
+          abilities: [],
+          affectedBy: {},
+          attackerOnly: true,
+        },
+        {
           name: 'Rabble',
           melee: 5,
           defense: 4,
@@ -39,20 +55,31 @@ export class FactionsService {
           }
         },
         {
-          name: 'Mawpup upgrade',
+          name: 'Fleabag Riders',
           melee: 4,
-          defense: 2,
+          defense: 4,
           sizes: [
             {
-              size: '1',
-              attack: { plus: 6 },
-              nerve: { waver: 0, rout: 0 },
-            }
+              size: 'Troop',
+              attack: { plus: 7 },
+              nerve: { waver: 9, rout: 11 },
+            },
+            {
+              size: 'Regiment',
+              attack: { plus: 14 },
+              nerve: { waver: 12, rout: 14 },
+            },
+            {
+              size: 'Horde',
+              attack: { plus: 28 },
+              nerve: { waver: 19, rout: 21 },
+            },
           ],
-          cs: 1,
-          abilities: [],
-          affectedBy: {},
-          attackerOnly: true,
+          tc: 1,
+          abilities: [ new Vicious() ],
+          affectedBy: {
+            rampage: true,
+          }
         },
       ]
     },

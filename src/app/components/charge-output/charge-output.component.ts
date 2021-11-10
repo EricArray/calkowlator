@@ -217,7 +217,6 @@ export class ChargeOutputComponent implements AfterViewInit, OnChanges {
   private buildNerveTestData(): ChartData {
     const labels = ['Steady', 'Waver', 'Rout']
 
-    const COLORS = [NERVE_COLORS.steady, NERVE_COLORS.waver, NERVE_COLORS.rout]
     const datasets = this.results.map((chargeResult, index) => ({
       label: "Charge #" + (index + 1),
       data: [
@@ -225,7 +224,11 @@ export class ChargeOutputComponent implements AfterViewInit, OnChanges {
         number(chargeResult.nerveTest.waver as any) as number,
         number(chargeResult.nerveTest.rout as any) as number,
       ],
-      backgroundColor: COLORS,
+      backgroundColor: [
+        NERVE_COLORS[index].steady,
+        NERVE_COLORS[index].waver,
+        NERVE_COLORS[index].rout,
+      ]
     }))
 
     return {

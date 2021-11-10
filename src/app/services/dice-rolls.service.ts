@@ -10,12 +10,13 @@ export function diceProbability(required: 1 | 2 | 3 | 4 | 5 | 6): MathType {
   return fraction(7 - required, 6)
 }
 
+// note: made some parameters optional for cleaner testing files
 export interface HitsParams {
   attack: DicePlusNumber;
   attackModifiers?: DicePlusNumber[];
   melee: Melee;
-  elite: boolean;
-  rerollList: { amount: DicePlusNumber, onlyOnes: boolean }[];
+  elite?: boolean;
+  rerollList?: { amount: DicePlusNumber, onlyOnes?: boolean }[];
   blast?: {
     dice?: 3 | 6;
     plus?: number;
@@ -25,8 +26,8 @@ export interface HitsParams {
 export interface WoundsParams {
   hitsTable: Map<number, MathType>;
   defense: 2|3|4|5|6;
-  vicious: boolean;
-  rerollList: { amount: DicePlusNumber, onlyOnes: boolean }[];
+  vicious?: boolean;
+  rerollList?: { amount: DicePlusNumber, onlyOnes?: boolean }[];
 }
 
 @Injectable({
@@ -62,11 +63,10 @@ export class DiceRollsService {
     }
 
     const finalTable = new Map<number, MathType>()
-    for (const { willReroll, probabilityToRerollThisManyDice } of this.combineRerolls(params.rerollList)) {
+    for (const { willReroll, probabilityToRerollThisManyDice } of this.combineRerolls(params.rerollList ?? [])) {
       // treat the normal attack as an attack modifier to compute the sum
       // TODO: move this logic out of this method, into the caller method or something
       const combinedAttackModifiers = this.combineAttackModifiers([params.attack, ...params.attackModifiers ?? []]);
-      console.log("combined attack modifiers", combinedAttackModifiers)
       for (const [ attacks, probabilityOfAttacks ] of combinedAttackModifiers) {
         // will never be able to reroll more that the initial dice
         const topReroll = min(attacks, willReroll)
@@ -78,7 +78,7 @@ export class DiceRollsService {
         const newTable = new Map<number, MathType>()
         for (const [hits, hitsProbability] of table) {
           const realHits = min(hits, attacks)
-          newTable.set(realHits, hitsProbability)
+          newTable.set(realHits, add(hitsProbability, newTable.get(realHits) ?? fraction(0)))
         }
         table = newTable
   
@@ -99,7 +99,7 @@ export class DiceRollsService {
     return finalTable
   }
   
-  private combineRerolls(rerollList: { amount: DicePlusNumber, onlyOnes: boolean }[]): { willReroll: number; probabilityToRerollThisManyDice: MathType }[] {
+  private combineRerolls(rerollList: { amount: DicePlusNumber, onlyOnes?: boolean }[]): { willReroll: number; probabilityToRerollThisManyDice: MathType }[] {
     if (rerollList.length === 0) {
       return [
         { willReroll: 0, probabilityToRerollThisManyDice: fraction(1) }
@@ -327,7 +327,7 @@ export class DiceRollsService {
     }
   }
 
-  private nerveTestWithWounds(wounds: number, defender: DefenderInputValues): NerveTest {
+  nerveTestWithWounds(wounds: number, defender: DefenderInputValues): NerveTest {
     const sumTable2d6 = this.getDiceSumTable(2, 6)
 
     const toRout = defender.nerve.rout - wounds

@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { equal, typeOf, fraction } from 'mathjs';
-import { rerollUpToOneDice } from '@models/reroll-function';
+import { DefenderInputValues } from '@app/models/defender-input-values';
+import { equal, typeOf, fraction, multiply, add } from 'mathjs';
 
 import { DiceRollsService } from './dice-rolls.service';
 
@@ -72,26 +72,26 @@ describe('DiceRollsService', () => {
 
   describe('hitsTable', () => {
     it('attack: 1, melee: 3+', () => {
-      expect(service.hitsTable({ attack: 1, melee: 3 })).toEqual(new Map([
+      expect(service.hitsTable({ attack: { plus: 1 }, melee: 3 })).toEqual(new Map([
         [0, fraction(2, 6)],
         [1, fraction(4, 6)],
       ]))
     })
-    it('attack: 1, melee: 3+, reroll ones', () => {
-      expect(service.hitsTable({ attack: 1, melee: 3, rerollFunctions: [rerollAllOnes()] })).toEqual(new Map([
+    it('attack: 1, melee: 3+, elite', () => {
+      expect(service.hitsTable({ attack: { plus: 1 }, melee: 3, elite: true})).toEqual(new Map([
         [0, fraction(16, 72)],
         [1, fraction(56, 72)],
       ]))
     })
     it('attack: 2, melee: 4+, reroll up to 1 dice', () => {
-      expect(service.hitsTable({ attack: 2, melee: 4, rerollFunctions: [rerollUpToOneDice()] })).toEqual(new Map([
+      expect(service.hitsTable({ attack: { plus: 2 }, melee: 4, rerollList: [{ amount: { plus: 1 } }] })).toEqual(new Map([
         [0, fraction(1, 8)],
         [1, fraction(3, 8)],
         [2, fraction(4, 8)],
       ]))
     })
     it('attack: 1, melee: 4+, blast D3', () => {
-      expect(service.hitsTable({ attack: 1, melee: 4, blast: { dice: 3 } })).toEqual(new Map([
+      expect(service.hitsTable({ attack: { plus: 1 }, melee: 4, blast: { dice: 3 } })).toEqual(new Map([
         [0, fraction(1, 2)],
         [1, fraction(1, 6)],
         [2, fraction(1, 6)],
@@ -99,7 +99,7 @@ describe('DiceRollsService', () => {
       ]))
     })
     it('attack: 1, melee: 4+, blast D6', () => {
-      expect(service.hitsTable({ attack: 1, melee: 4, blast: { dice: 6 } })).toEqual(new Map([
+      expect(service.hitsTable({ attack: { plus: 1 }, melee: 4, blast: { dice: 6 } })).toEqual(new Map([
         [0, fraction(1, 2)],
         [1, fraction(1, 12)],
         [2, fraction(1, 12)],
@@ -110,7 +110,7 @@ describe('DiceRollsService', () => {
       ]))
     })
     it('attack: 1, melee: 4+, blast D3 + 1', () => {
-      expect(service.hitsTable({ attack: 1, melee: 4, blast: { dice: 3, plus: 1 } })).toEqual(new Map([
+      expect(service.hitsTable({ attack: { plus: 1 }, melee: 4, blast: { dice: 3, plus: 1 } })).toEqual(new Map([
         [0, fraction(1, 2)],
         [1, fraction(0)],
         [2, fraction(1, 6)],
@@ -119,7 +119,7 @@ describe('DiceRollsService', () => {
       ]))
     })
     it('attack: 2, melee: 4+, blast D3', () => {
-      expect(service.hitsTable({ attack: 2, melee: 4, blast: { dice: 3 } })).toEqual(new Map([
+      expect(service.hitsTable({ attack: { plus: 2 }, melee: 4, blast: { dice: 3 } })).toEqual(new Map([
         [0, fraction(1, 4)],
         [1, fraction(1, 6)],
         [2, fraction(7, 36)],
@@ -130,18 +130,18 @@ describe('DiceRollsService', () => {
       ]))
     })
     it('attack: 1, melee: 4+, blast undefined', () => {
-      expect(service.hitsTable({ attack: 1, melee: 4, blast: { } })).toEqual(new Map([
+      expect(service.hitsTable({ attack: { plus: 1 }, melee: 4, blast: { } })).toEqual(new Map([
         [0, fraction(1, 1)],
       ]))
     })
     it('attack: 1, melee: 4+, blast 1', () => {
-      expect(service.hitsTable({ attack: 1, melee: 4, blast: { plus: 1 } })).toEqual(new Map([
+      expect(service.hitsTable({ attack: { plus: 1 }, melee: 4, blast: { plus: 1 } })).toEqual(new Map([
         [0, fraction(1, 2)],
         [1, fraction(1, 2)],
       ]))
     })
     it('attack: 1, melee: 4+, blast 2', () => {
-      expect(service.hitsTable({ attack: 1, melee: 4, blast: { plus: 2} })).toEqual(new Map([
+      expect(service.hitsTable({ attack: { plus: 1 }, melee: 4, blast: { plus: 2} })).toEqual(new Map([
         [0, fraction(1, 2)],
         [1, fraction(0, 1)],
         [2, fraction(1, 2)],
@@ -151,16 +151,16 @@ describe('DiceRollsService', () => {
   
   describe('woundsTable', () => {
     it('attack: 1, melee: 4+, defense: 4+', () => {
-      const hitsTable = service.hitsTable({ attack: 1, melee: 4 })
-      const woundsTable = service.woundsTable(hitsTable, 4, [])
+      const hitsTable = service.hitsTable({ attack: { plus: 1 }, melee: 4 })
+      const woundsTable = service.woundsTable({ hitsTable, defense: 4 })
       expect(woundsTable).toEqual(new Map([
         [0, fraction(3, 4)],
         [1, fraction(1, 4)],
       ]))
     })
     it('attack: 2, melee: 4+, defense: 4+', () => {
-      const hitsTable = service.hitsTable({ attack: 2, melee: 4 })
-      const woundsTable = service.woundsTable(hitsTable, 4, [])
+      const hitsTable = service.hitsTable({ attack: { plus: 2 }, melee: 4 })
+      const woundsTable = service.woundsTable({ hitsTable, defense: 4 })
       expect(woundsTable).toEqual(new Map([
         [0, fraction(9, 16)],
         [1, fraction(6, 16)],
@@ -168,8 +168,8 @@ describe('DiceRollsService', () => {
       ]))
     })
     it('attack: 2, melee: 4+, defense: 4+', () => {
-      const hitsTable = service.hitsTable({ attack: 2, melee: 4 })
-      const woundsTable = service.woundsTable(hitsTable, 4, [])
+      const hitsTable = service.hitsTable({ attack: { plus: 2 }, melee: 4 })
+      const woundsTable = service.woundsTable({ hitsTable, defense: 4 })
       expect(woundsTable).toEqual(new Map([
         [0, fraction(9, 16)],
         [1, fraction(6, 16)],
@@ -177,8 +177,8 @@ describe('DiceRollsService', () => {
       ]))
     })
     it('attack: 3, melee: 6+, defense: 3+, elite and vicious', () => {
-      const hitsTable = service.hitsTable({ attack: 3, melee: 6, rerollFunctions: [rerollAllOnes()]})
-      const woundsTable = service.woundsTable(hitsTable, 3, [rerollAllOnes()])
+      const hitsTable = service.hitsTable({ attack: { plus: 3 }, melee: 6, elite: true})
+      const woundsTable = service.woundsTable({ hitsTable, defense: 3, vicious: true })
       expect(woundsTable).toEqual(new Map([
         [0, fraction(20796875, 34012224)],
         [1, fraction(3705625, 11337408)],
@@ -265,5 +265,290 @@ describe('DiceRollsService', () => {
         [1, fraction(-1, 4)],
       ]))
     })
+  })
+
+  const dwarfIroncladRegiment: DefenderInputValues = {
+    name: 'Ironclad Regiment',
+    defense: 4,
+    nerve: { waver: 14, rout: 16 },
+    affectedBy: { rampage: true },
+    inspired: false,
+  }
+
+  const dwarfIroncladRegiment_inspired: DefenderInputValues = {
+    name: 'Ironclad Regiment',
+    defense: 4,
+    nerve: { waver: 14, rout: 16 },
+    affectedBy: { rampage: true },
+    inspired: true,
+  }
+
+  const dwarfBerserkersRegiment: DefenderInputValues = {
+    name: 'Berserkers Regiment',
+    defense: 4,
+    nerve: { waver: 'fearless', rout: 17 },
+    affectedBy: { rampage: true },
+    inspired: false,
+  }
+
+  const dwarfBerserkersRegiment_inspired: DefenderInputValues = {
+    name: 'Berserkers Regiment',
+    defense: 4,
+    nerve: { waver: 'fearless', rout: 17 },
+    affectedBy: { rampage: true },
+    inspired: true,
+  }
+
+  const gargoylesTroop: DefenderInputValues = {
+    name: 'Gargoyles Troop',
+    defense: 3,
+    nerve: { waver: 8, rout: 10 },
+    affectedBy: { rampage: true },
+    inspired: false,
+  }
+
+  const gargoylesTroop_inspired: DefenderInputValues = {
+    name: 'Gargoyles Troop',
+    defense: 3,
+    nerve: { waver: 8, rout: 10 },
+    affectedBy: { rampage: true },
+    inspired: true,
+  }
+
+  describe('nerveTestWithWounds', () => {
+    it('14/16 on 0 wounds', () => {
+      expect(service.nerveTestWithWounds(0, dwarfIroncladRegiment)).toEqual({
+        steady: fraction(35, 36),
+        waver: fraction(1, 36),
+        rout: fraction(0),
+      })
+    })
+    
+    it('14/16 on 0 wounds, inspired', () => {
+      expect(service.nerveTestWithWounds(0, dwarfIroncladRegiment_inspired)).toEqual({
+        steady: fraction(35, 36),
+        waver: fraction(1, 36),
+        rout: fraction(0),
+      })
+    })
+    
+    it('14/16 on 1 wounds', () => {
+      expect(service.nerveTestWithWounds(1, dwarfIroncladRegiment)).toEqual({
+        steady: fraction(35, 36),
+        waver: fraction(1, 36),
+        rout: fraction(0),
+      })
+    })
+    
+    it('14/16 on 1 wounds, inspired', () => {
+      expect(service.nerveTestWithWounds(1, dwarfIroncladRegiment_inspired)).toEqual({
+        steady: fraction(35, 36),
+        waver: fraction(1, 36),
+        rout: fraction(0),
+      })
+    })
+    
+    it('14/16 on 2 wounds', () => {
+      expect(service.nerveTestWithWounds(2, dwarfIroncladRegiment)).toEqual({
+        steady: fraction(35, 36),
+        waver: fraction(1, 36),
+        rout: fraction(0),
+      })
+    })
+    
+    it('14/16 on 3 wounds', () => {
+      expect(service.nerveTestWithWounds(3, dwarfIroncladRegiment)).toEqual({
+        steady: fraction(33, 36),
+        waver: fraction(3, 36),
+        rout: fraction(0),
+      })
+    })
+    
+    it('14/16 on 4 wounds', () => {
+      expect(service.nerveTestWithWounds(4, dwarfIroncladRegiment)).toEqual({
+        steady: fraction(30, 36),
+        waver: fraction(5, 36),
+        rout: fraction(1, 36),
+      })
+    })
+
+    it('14/16 on 5 wounds', () => {
+      expect(service.nerveTestWithWounds(5, dwarfIroncladRegiment)).toEqual({
+        steady: fraction(26, 36),
+        waver: fraction(7, 36),
+        rout: fraction(3, 36),
+      })
+    })
+    
+    it('14/16 on 6 wounds', () => {
+      expect(service.nerveTestWithWounds(6, dwarfIroncladRegiment)).toEqual({
+        steady: fraction(21, 36),
+        waver: fraction(9, 36),
+        rout: fraction(6, 36),
+      })
+    })
+    
+    it('14/16 on 6 wounds, inspired', () => {
+      expect(service.nerveTestWithWounds(6, dwarfIroncladRegiment_inspired)).toEqual({
+        steady: add(fraction(21, 36), multiply(fraction(6, 36), fraction(21, 36))),
+        waver: add(fraction(9, 36), multiply(fraction(6, 36), fraction(9, 36))),
+        rout: multiply(fraction(6, 36), fraction(6, 36)),
+      })
+    })
+    
+    it('-/17 on 0 wounds', () => {
+      expect(service.nerveTestWithWounds(0, dwarfBerserkersRegiment)).toEqual({
+        steady: fraction(1),
+        waver: fraction(0),
+        rout: fraction(0),
+      })
+    })
+    
+    it('-/17 on 0 wounds, inspired', () => {
+      expect(service.nerveTestWithWounds(0, dwarfBerserkersRegiment_inspired)).toEqual({
+        steady: fraction(1),
+        waver: fraction(0),
+        rout: fraction(0),
+      })
+    })
+    
+    it('-/17 on 1 wounds', () => {
+      expect(service.nerveTestWithWounds(1, dwarfBerserkersRegiment)).toEqual({
+        steady: fraction(1),
+        waver: fraction(0),
+        rout: fraction(0),
+      })
+    })
+    
+    it('-/17 on 0 wounds, inspired', () => {
+      expect(service.nerveTestWithWounds(1, dwarfBerserkersRegiment_inspired)).toEqual({
+        steady: fraction(1),
+        waver: fraction(0),
+        rout: fraction(0),
+      })
+    })
+    
+    it('-/17 on 5 wounds', () => {
+      expect(service.nerveTestWithWounds(5, dwarfBerserkersRegiment)).toEqual({
+        steady: fraction(35, 36),
+        waver: fraction(0),
+        rout: fraction(1, 36),
+      })
+    })
+    
+    it('-/17 on 5 wounds, inspired', () => {
+      expect(service.nerveTestWithWounds(5, dwarfBerserkersRegiment_inspired)).toEqual({
+        steady: add(fraction(35, 36), multiply(fraction(1, 36), fraction(35, 36))),
+        waver: fraction(0),
+        rout: multiply(fraction(1, 36), fraction(1, 36)),
+      })
+    })
+    
+    it('-/17 on 10 wounds', () => {
+      expect(service.nerveTestWithWounds(10, dwarfBerserkersRegiment)).toEqual({
+        steady: fraction(15, 36),
+        waver: fraction(0),
+        rout: fraction(21, 36),
+      })
+    })
+    
+    it('-/17 on 10 wounds, inpsired', () => {
+      expect(service.nerveTestWithWounds(10, dwarfBerserkersRegiment_inspired)).toEqual({
+        steady: add(fraction(15, 36), multiply(fraction(21, 36), fraction(15, 36))),
+        waver: fraction(0),
+        rout: multiply(fraction(21, 36), fraction(21, 36)),
+      })
+    })
+  })
+
+  describe('nerveTest', () => {
+    it('wounds: [0 => 100%] should not roll nerve', () => {
+      const woundsTable = new Map([[0, fraction(1)]])
+      const defender: DefenderInputValues = {
+        name: '',
+        defense: 4,
+        inspired: true,
+        nerve: { waver: 1, rout: 2 }, // nerve 1/2 would be steady only 1/36 if tested
+        affectedBy: {},
+      }
+      expect(service.nerveTest(woundsTable, defender, [])).toEqual({
+        steady: fraction(1),
+        waver: fraction(0),
+        rout: fraction(0),
+      })
+    })
+    
+    it('wounds: [0 => 3/4, 1 => 1/4] against 14/16', () => {
+      const woundsTable = new Map([
+        [0, fraction(3, 4)],
+        [1, fraction(1, 4)],
+      ])
+      expect(service.nerveTest(woundsTable, dwarfIroncladRegiment, [])).toEqual({
+        steady: fraction(36*4 - 1, 36*4),
+        waver: fraction(1, 36*4),
+        rout: fraction(0),
+      })
+    })
+    
+    it('wounds: [0 => 3/4, 1 => 1/4] against 14/16, inspired', () => {
+      const woundsTable = new Map([
+        [0, fraction(3, 4)],
+        [1, fraction(1, 4)],
+      ])
+      expect(service.nerveTest(woundsTable, dwarfIroncladRegiment_inspired, [])).toEqual({
+        steady: fraction(36*4 - 1, 36*4),
+        waver: fraction(1, 36*4),
+        rout: fraction(0),
+      })
+    })
+    
+    it('wounds: [0 => 3/4, 1 => 1/4] against -/17', () => {
+      const woundsTable = new Map([
+        [0, fraction(3, 4)],
+        [1, fraction(1, 4)],
+      ])
+      expect(service.nerveTest(woundsTable, dwarfBerserkersRegiment, [])).toEqual({
+        steady: fraction(1),
+        waver: fraction(0),
+        rout: fraction(0),
+      })
+    })
+    
+    it('wounds: [0 => 3/4, 1 => 1/4] against -/17, inspired', () => {
+      const woundsTable = new Map([
+        [0, fraction(3, 4)],
+        [1, fraction(1, 4)],
+      ])
+      expect(service.nerveTest(woundsTable, dwarfBerserkersRegiment_inspired, [])).toEqual({
+        steady: fraction(1),
+        waver: fraction(0),
+        rout: fraction(0),
+      })
+    })
+    
+    it('wounds: [0 => 3/4, 1 => 1/4] against 8/10', () => {
+      const woundsTable = new Map([
+        [0, fraction(3, 4)],
+        [1, fraction(1, 4)],
+      ])
+      expect(service.nerveTest(woundsTable, gargoylesTroop, [])).toEqual({
+        steady: add(fraction(3, 4), multiply(fraction(1, 4), fraction(15, 36))),
+        waver: multiply(fraction(1, 4), fraction(11, 36)),
+        rout: multiply(fraction(1, 4), fraction(10, 36)),
+      })
+    })
+    
+    it('wounds: [0 => 3/4, 1 => 1/4] against 8/10, inspired', () => {
+      const woundsTable = new Map([
+        [0, fraction(3, 4)],
+        [1, fraction(1, 4)],
+      ])
+      expect(service.nerveTest(woundsTable, gargoylesTroop_inspired, [])).toEqual({
+        steady: fraction(4578, 5184),
+        waver: fraction(506, 5184),
+        rout: fraction(100, 5184),
+      })
+    })
+    
   })
 })

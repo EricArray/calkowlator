@@ -12,5 +12,5 @@ export interface DefenderInputValues {
         rampage?: boolean;
         duelist?: boolean;
     };
-    wasLoaded: boolean;
+    wasLoaded?: boolean;
 }

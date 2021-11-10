@@ -40,7 +40,7 @@ jobs:
       - name: Test
         run: |
           npm install
-          npm run-script test
+          npm run-script test-ci
       
       - name: Build
         run: |

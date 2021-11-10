@@ -24,6 +24,9 @@ describe('DiceRollsService', () => {
     expect(service).toBeTruthy()
   })
 
+  it('forced to fail to check if CI breaks', () => {
+    expect(true).toEqual(false)
+  })
 
   describe('probabilityToGetSuccesses', () => {
     describe('1 dice on 3+', () => {

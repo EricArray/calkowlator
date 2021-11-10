@@ -6,10 +6,12 @@
                 <tr>
                     <td></td>
                     <td>Average</td>
+                    <td>80%</td>
                 </tr>
-                <tr *ngFor="let hitsAverage of hitsAverages">
-                    <td style="padding-right: 1em">{{ hitsAverage.chargeName }}</td>
-                    <td style="text-align: center;">{{ hitsAverage.average }} hits</td>
+                <tr *ngFor="let hitsAverage of hitsAverages; let index = index">
+                    <td [style.color]="CHARGE_COLORS[index]">{{ hitsAverage.chargeName }}</td>
+                    <td>{{ hitsAverage.average }} hits</td>
+                    <td>{{ hitsAverage._80PercentRange }} hits</td>
                 </tr>
             </tbody>
         </table>
@@ -21,10 +23,12 @@
                 <tr>
                     <td></td>
                     <td>Average</td>
+                    <td>80%</td>
                 </tr>
-                <tr *ngFor="let woundsAverage of woundsAverages">
-                    <td style="padding-right: 1em">{{ woundsAverage.chargeName }}</td>
-                    <td style="text-align: center;">{{ woundsAverage.average }} wounds</td>
+                <tr *ngFor="let woundsAverage of woundsAverages; let index = index">
+                    <td [style.color]="CHARGE_COLORS[index]">{{ woundsAverage.chargeName }}</td>
+                    <td>{{ woundsAverage.average }} wounds</td>
+                    <td>{{ woundsAverage._80PercentRange }} wounds</td>
                 </tr>
             </tbody>
         </table>

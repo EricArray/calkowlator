@@ -2,3 +2,9 @@
     display: flex;
     flex-direction: row;
 }
+
+td {
+    padding-left: 1em;
+    padding-right: 1em;
+    text-align: center;
+}

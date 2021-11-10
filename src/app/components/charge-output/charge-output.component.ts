@@ -21,8 +21,10 @@ export class ChargeOutputComponent implements AfterViewInit, OnChanges {
   woundsChart?: Chart
   nerveTestChart?: Chart
 
-  hitsAverages:  { chargeName: string; average: string }[] = []
-  woundsAverages:  { chargeName: string; average: string }[] = []
+  hitsAverages:  { chargeName: string; average: string; _80PercentRange: string }[] = []
+  woundsAverages:  { chargeName: string; average: string; _80PercentRange: string }[] = []
+  
+  CHARGE_COLORS = CHARGE_COLORS
   
   constructor() { }
 
@@ -160,15 +162,17 @@ export class ChargeOutputComponent implements AfterViewInit, OnChanges {
   }
 
   private buildHitsData(): ChartData {
-    this.hitsAverages = this.results.map((chargeResult, index) => ({
-      chargeName: 'Charge #' + (index + 1),
-      average: format(this.getTableAverage(chargeResult.hitsTable), 3)
-    }))
-
     const topHits = max(
       0,
       ...this.results.map(chargeResult => max(0, ...chargeResult.hitsTable.keys()))
     )
+    
+    this.hitsAverages = this.results.map((chargeResult, index) => ({
+      chargeName: 'Charge #' + (index + 1),
+      average: format(this.getTableAverage(chargeResult.hitsTable), 3),
+      _80PercentRange: this.get80PercentRange(chargeResult.hitsTable, topHits),
+    }))
+
     const labels = fromZeroTo(topHits)
 
     const datasets = this.results.map((chargeResult, index) => ({
@@ -187,16 +191,17 @@ export class ChargeOutputComponent implements AfterViewInit, OnChanges {
   }
 
   private buildWoundsData(): ChartData {
-    this.woundsAverages = this.results.map((chargeResult, index) => ({
-      chargeName: 'Charge #' + (index + 1),
-      average: format(this.getTableAverage(chargeResult.woundsTable), 3)
-    }))
-
-
     const topWounds = max(
       0,
       ...this.results.map(chargeResult => max(0, ...chargeResult.woundsTable.keys()))
     )
+
+    this.woundsAverages = this.results.map((chargeResult, index) => ({
+      chargeName: 'Charge #' + (index + 1),
+      average: format(this.getTableAverage(chargeResult.woundsTable), 3),
+      _80PercentRange: this.get80PercentRange(chargeResult.woundsTable, topWounds),
+    }))
+
     const labels = fromZeroTo(topWounds)
 
     const datasets = this.results.map((chargeResult, index) => ({
@@ -243,4 +248,41 @@ export class ChargeOutputComponent implements AfterViewInit, OnChanges {
       .reduce((a, b) => add(a, b), fraction(0)) as any) as number
   }
 
+  private get80PercentRange(table: Map<number, MathType>, topHits: number): string {
+    let mostProbableHits = 0
+    for (const [hits, probability] of table) {
+      if (probability > (table.get(mostProbableHits) ?? 0)) {
+        mostProbableHits = hits
+      }
+    }
+
+    let accumProbability = table.get(mostProbableHits) ?? 0
+    let inspectedFrom = mostProbableHits
+    let inspectedTo = mostProbableHits
+    while (
+      (inspectedTo - inspectedFrom + 1) < topHits &&
+      accumProbability < fraction(80, 100)
+    ) {
+      let next: number
+      if (inspectedFrom - 1 < 0) {
+        next = inspectedTo + 1
+        inspectedTo += 1
+      } else if (inspectedTo + 1 > topHits) {
+        next = inspectedFrom - 1
+        inspectedFrom -= 1
+      } else {
+        if ((table.get(inspectedFrom - 1) ?? 0) > (table.get(inspectedTo + 1) ?? 0)) {
+          next = inspectedFrom - 1
+          inspectedFrom -= 1
+        } else {
+          next = inspectedTo + 1
+          inspectedTo += 1
+        }
+      }
+
+      accumProbability = add(accumProbability, table.get(next) ?? 0)
+    }
+
+    return `${ format(number(accumProbability as any * 100), 2) } % between ${ inspectedFrom } and ${ inspectedTo }`
+  }
 }

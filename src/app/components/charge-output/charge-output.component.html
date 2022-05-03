@@ -9,9 +9,18 @@
                     <td>80%</td>
                 </tr>
                 <tr *ngFor="let hitsAverage of hitsAverages; let index = index">
-                    <td [style.color]="CHARGE_COLORS[index]">{{ hitsAverage.chargeName }}</td>
+                    <td class="charge-name-td" [style.color]="CHARGE_COLORS[index]">{{ hitsAverage.chargeName }}</td>
                     <td>{{ hitsAverage.average }} hits</td>
                     <td>{{ hitsAverage._80PercentRange }} hits</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table *ngIf="selectedHits" class="selected-score-or-more-table">
+            <tbody>
+                <tr *ngFor="let selectedHitsOrMoreChance of selectedHitsOrMoreChances; let index = index">
+                    <td class="charge-name-td" [style.color]="CHARGE_COLORS[index]">{{ selectedHitsOrMoreChance.chargeName }}</td>
+                    <td class="selected-score-or-more-chance">{{ selectedHitsOrMoreChance.chance }} % of {{ selectedHits }} or more hits</td>
                 </tr>
             </tbody>
         </table>
@@ -26,9 +35,18 @@
                     <td>80%</td>
                 </tr>
                 <tr *ngFor="let woundsAverage of woundsAverages; let index = index">
-                    <td [style.color]="CHARGE_COLORS[index]">{{ woundsAverage.chargeName }}</td>
+                    <td class="charge-name-td" [style.color]="CHARGE_COLORS[index]">{{ woundsAverage.chargeName }}</td>
                     <td>{{ woundsAverage.average }} wounds</td>
                     <td>{{ woundsAverage._80PercentRange }} wounds</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <table *ngIf="selectedWounds" class="selected-score-or-more-table">
+            <tbody>
+                <tr *ngFor="let selectedWoundsOrMoreChance of selectedWoundsOrMoreChances; let index = index">
+                    <td class="charge-name-td" [style.color]="CHARGE_COLORS[index]">{{ selectedWoundsOrMoreChance.chargeName }}</td>
+                    <td class="selected-score-or-more-chance">{{ selectedWoundsOrMoreChance.chance }} % of {{ selectedWounds }} or more wounds</td>
                 </tr>
             </tbody>
         </table>

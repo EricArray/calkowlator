@@ -8,3 +8,17 @@ td {
     padding-right: 1em;
     text-align: center;
 }
+
+.charge-name-td {
+    width: 1px;
+    white-space: nowrap;
+}
+
+.selected-score-or-more-table {
+    border-top: 1px solid gray;
+    width: 100%;
+}
+
+.selected-score-or-more-chance {
+    text-align: left;
+}

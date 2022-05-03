@@ -29,19 +29,33 @@ export class AppComponent {
   results: ChargeResult[] = []
   error = false
 
+  isComparing = false;
+
   get charges(): ChargeInputValues[] {
-    return (
-      this.charge1Component && this.charge2Component
-        ? [
-          this.charge1Component?.charge,
-          this.charge2Component?.charge,
-        ]
-        : []
-    )
+    if (this.isComparing) {
+      return (
+        this.charge1Component && this.charge2Component
+          ? [
+            this.charge1Component?.charge,
+            this.charge2Component?.charge,
+          ]
+          : []
+      )
+    } else {
+      return (
+        this.charge1Component
+          ? [this.charge1Component?.charge]
+          : []
+        )
+    }
   }
 
   constructor(private diceRollsService: DiceRollsService) {}
 
+  toggleIsComparing(): void {
+    this.isComparing = !this.isComparing
+  }
+  
   calculate(): void {
     this.error = false
     try {

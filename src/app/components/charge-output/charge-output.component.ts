@@ -1,6 +1,6 @@
 import { AfterViewChecked, AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { Chart, ChartData, LineController, registerables } from 'chart.js';
-import { add, format, fraction, MathType, max, multiply, number } from 'mathjs';
+import { add, format, Fraction, fraction, MathType, max, multiply, number } from 'mathjs';
 import { ChargeResult } from '@models/charge-result';
 import { fromZeroTo } from '@app/util';
 import { CHARGE_COLORS, NERVE_COLORS } from '@app/colors';
@@ -23,6 +23,12 @@ export class ChargeOutputComponent implements AfterViewInit, OnChanges {
 
   hitsAverages:  { chargeName: string; average: string; _80PercentRange: string }[] = []
   woundsAverages:  { chargeName: string; average: string; _80PercentRange: string }[] = []
+
+  selectedHits: number | null = null
+  selectedHitsOrMoreChances: { chargeName: string; chance: string }[] | null = null;
+  
+  selectedWounds: number | null = null
+  selectedWoundsOrMoreChances: { chargeName: string; chance: string }[] | null = null;
   
   CHARGE_COLORS = CHARGE_COLORS
   
@@ -33,6 +39,8 @@ export class ChargeOutputComponent implements AfterViewInit, OnChanges {
       this.updateHitsChart()
       this.updateWoundsChart()
       this.updateNerveTestChart()
+      this.clearSelectedHits()
+      this.clearSelectedWounds()
     }
   }
 
@@ -71,10 +79,39 @@ export class ChargeOutputComponent implements AfterViewInit, OnChanges {
                 label: (context: any) => context.dataset.label + ': ' + format(context.raw * 100, 3) + ' %'
               }
             },
-          }
+          },
+          onClick: (event, elements) => {
+            const element = elements[0]
+            if (element) {
+              const hits = element.index
+              this.setSelectedHits(hits)
+            } else {
+              this.clearSelectedHits()
+            }
+          },
         },
       });
     }
+  }
+
+  private setSelectedHits(selectedHits: number): void {
+    this.selectedHits = selectedHits
+    this.selectedHitsOrMoreChances = this.results.map((chargeResult, index) => {
+      let chargeTotal = fraction(0) as Fraction
+      for (let i = selectedHits; i <= chargeResult.hitsTable.size; i++) {
+        chargeTotal = add(chargeTotal, chargeResult.hitsTable.get(i) ?? fraction(0)) as Fraction
+      }
+
+      return {
+        chargeName: 'Charge #' + (index + 1),
+        chance: format(number(chargeTotal as any * 100), 3),
+      }
+    })
+  }
+
+  private clearSelectedHits(): void {
+    this.selectedHits = null
+    this.selectedHitsOrMoreChances = null
   }
 
   private setupWoundsChart(): void {
@@ -104,10 +141,39 @@ export class ChargeOutputComponent implements AfterViewInit, OnChanges {
                 label: (context: any) => context.dataset.label + ': ' + format(context.raw * 100, 3) + ' %'
               }
             },
-          }
+          },
+          onClick: (event, elements) => {
+            const element = elements[0]
+            if (element) {
+              const wounds = element.index
+              this.setSelectedWounds(wounds)
+            } else {
+              this.clearSelectedWounds()
+            }
+          },
         },
       });
     }
+  }
+
+  private setSelectedWounds(selectedWounds: number): void {
+    this.selectedWounds = selectedWounds
+    this.selectedWoundsOrMoreChances = this.results.map((chargeResult, index) => {
+      let chargeTotal = fraction(0) as Fraction
+      for (let i = selectedWounds; i <= chargeResult.woundsTable.size; i++) {
+        chargeTotal = add(chargeTotal, chargeResult.woundsTable.get(i) ?? fraction(0)) as Fraction
+      }
+
+      return {
+        chargeName: 'Charge #' + (index + 1),
+        chance: format(number(chargeTotal as any * 100), 3),
+      }
+    })
+  }
+
+  private clearSelectedWounds(): void {
+    this.selectedWounds = null
+    this.selectedWoundsOrMoreChances = null
   }
 
   private setupNerveTestChart(): void {

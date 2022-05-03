@@ -3,6 +3,10 @@ h1 {
     text-align: center;
 }
 
-.btn-calculate {
+.buttons-container .btn {
     width: 300px;
+}
+
+.buttons-container .btn:not(:first-child) {
+    margin-left: 20px;
 }

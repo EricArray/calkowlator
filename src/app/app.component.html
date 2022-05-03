@@ -1,17 +1,20 @@
+<form>
+
 <h1>Cal<b>KoW</b>lator</h1>
 
 <div>
-    <h3 style="text-decoration: underline 2px;" [style.color]="CHARGE_COLORS[0]">Charge #1</h3>
+    <h3 *ngIf="isComparing" style="text-decoration: underline 2px;" [style.color]="CHARGE_COLORS[0]">Charge #1</h3>
     <app-charge-input #charge1></app-charge-input>
 </div>
 
-<div>
+<div *ngIf="isComparing">
     <h3 style="text-decoration: underline 2px;" [style.color]="CHARGE_COLORS[1]">Charge #2</h3>
     <app-charge-input #charge2></app-charge-input>
 </div>
 
-<div style="display: flex; justify-content: center;">
-    <button class="btn btn-primary btn-calculate" (click)="calculate()">Calculate</button>
+<div style="display: flex; justify-content: center;" class="buttons-container">
+    <button class="btn btn-secondary" type="button" (click)="toggleIsComparing()">Compare with other charge</button>
+    <button class="btn btn-primary" type="submit" (click)="calculate()">Calculate</button>
 </div>
 
 <div *ngIf="!error && results.length" class="results">
@@ -33,6 +36,9 @@
         position: relative
     }
 </style>
+
+</form>
+
 <footer>
     <div>Email: <a href="mailto:ernokstein@gmail.com">ernokstein@gmail.com</a></div>
     <div style="position: absolute; right: 0; top: 0"><a href="https://github.com/ernokstein/calkowlator">Source code</a></div>

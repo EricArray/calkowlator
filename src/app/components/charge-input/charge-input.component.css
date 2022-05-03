@@ -15,6 +15,11 @@
     width: 3em;
 }
 
+.container-affected-by {
+    font-size: 15px;
+    line-height: 19px;
+}
+
 .nerve-input {
     display: flex;
     flex-direction: row;
